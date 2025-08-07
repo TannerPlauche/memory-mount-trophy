@@ -1,4 +1,4 @@
-import { createFile } from "@/app/services/file.service";
+import { createFile, listFiles } from "@/app/services/file.service";
 import { redirect } from "next/navigation";
 import { writeFile, unlink, } from "fs/promises";
 import path from "path";
@@ -8,14 +8,46 @@ interface TrophyIdParams {
     params: Promise<{ trophyId: string }>;
 }
 
+export async function GET(req: Request, { params }: { params: Promise<{ trophyId: string }> }) {
+    const { trophyId } = await params;
+    console.log('trophyId: ', trophyId);
+    if (!trophyId || typeof trophyId !== 'string') {
+        console.error("Invalid trophyId:", trophyId);
+        return new Response(JSON.stringify({ error: "Trophy ID is required" }), {
+            status: 400,
+        });
+    }
+    try {
+        const files = await listFiles(trophyId);
+
+        if (!files || files.length === 0) {
+            console.warn("No files found for trophyId:", trophyId);
+            return new Response(JSON.stringify({ error: "No files found" }), {
+                status: 404,
+                headers: { "Content-Type": "application/json" },
+            });
+        }
+
+        return new Response(JSON.stringify(files), {
+            headers: { "Content-Type": "application/json" },
+        });
+    } catch (error: any) {
+        return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+        });
+    }
+}
+
 export async function POST(req: Request, { params }: TrophyIdParams) {
     const { trophyId } = await params;
+    console.log('trophyId: ', trophyId);
 
     try {
         const formData = await req.formData();
         const file = formData.get("file") as File;
 
-        if (!file || !(file instanceof File)) {
+        if (!file) {
             throw new Error("No file uploaded");
         }
 

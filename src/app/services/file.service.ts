@@ -39,6 +39,12 @@ const streamToString = async (stream: any) => {
 export async function createFile(trophyId: string, fileName: string, file: any) {
     // const { folder, fileName, content } = req.body;
     const folder = 'memory-mount';
+
+    const files = await listFiles(trophyId);
+    if (files.length > 0) {
+        await emptyBucket(files);
+    }
+
     const params = {
         Bucket: BUCKET_NAME,
         Key: `${trophyId}/${fileName}`,
@@ -70,4 +76,25 @@ export const listFiles = async (folder: string) => {
         console.error("Error listing files:", error);
         return [];
     }
+}
+
+export const emptyBucket = async (files: any[]) => {
+    try {
+        if (files.length > 0) {
+            for (const file of files) {
+                const deleteParams = {
+                    Bucket: BUCKET_NAME,
+                    Key: file.Key,
+                };
+                const deleteCommand = new DeleteObjectCommand(deleteParams);
+                await s3.send(deleteCommand);
+            }
+        }
+
+        return { message: "Bucket emptied successfully" };
+    } catch (error) {
+        console.error("Error emptying bucket:", error);
+        return { error: error.message };
+    }
+
 }
