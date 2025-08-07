@@ -10,7 +10,7 @@ interface TrophyIdParams {
 
 export async function GET(req: Request, { params }: { params: Promise<{ trophyId: string }> }) {
     const { trophyId } = await params;
-    console.log('trophyId: ', trophyId);
+    console.log('getting files for: ', trophyId);
     if (!trophyId || typeof trophyId !== 'string') {
         console.error("Invalid trophyId:", trophyId);
         return new Response(JSON.stringify({ error: "Trophy ID is required" }), {
@@ -41,17 +41,17 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
 
 export async function POST(req: Request, { params }: TrophyIdParams) {
     const { trophyId } = await params;
-    console.log('trophyId: ', trophyId);
+    console.log('creating file for trophyId: ', trophyId);
 
     try {
         const formData = await req.formData();
         const file = formData.get("file") as File;
-
+        const fileName = formData.get("name") as string;
         if (!file) {
             throw new Error("No file uploaded");
         }
 
-        const safeFileName = file.name.replace(/[\\/\s-]/g, "_");
+        const safeFileName = fileName.replace(/[\\/\s-]/g, "_");
         const localFilePath = path.join(process.cwd(), "public/assets", safeFileName);
 
         const buffer = Buffer.from(await file.arrayBuffer());

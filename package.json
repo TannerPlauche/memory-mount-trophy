@@ -10,13 +10,15 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.859.0",
+    "@vercel/blob": "^1.1.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.11.0",
     "formidable": "^3.5.4",
     "multer": "^2.0.2",
     "next": "15.4.5",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-loader-spinner": "^6.1.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       }
     ]
   },
+  BLOB_READ_WRITE_TOKEN: "vercel_blob_rw_EFKxcO7AEWrVgfGj_eOM9YZbCqXL5ezxBgirFDYpDHhehEZ"
 };
 
 export default nextConfig;
