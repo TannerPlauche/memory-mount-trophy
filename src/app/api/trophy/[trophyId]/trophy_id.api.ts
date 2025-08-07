@@ -31,8 +31,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
         return new Response(JSON.stringify(files), {
             headers: { "Content-Type": "application/json" },
         });
-    } catch (error: any) {
-        return new Response(JSON.stringify({ error: error.message }), {
+    } catch (error: unknown) {
+        return new Response(JSON.stringify({ error: (error as Error).message }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });
@@ -64,8 +64,8 @@ export async function POST(req: Request, { params }: TrophyIdParams) {
             console.error("Failed to delete local file:", err)
         );
 
-        if (result.error) {
-            console.error("Upload error:", result.error);
+        if (!result) {
+            console.error("Upload error:");
         }
 
         // Redirect regardless of error or success

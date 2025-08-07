@@ -1,13 +1,9 @@
 import { del, list, put } from '@vercel/blob';
+import { ReadStream } from 'fs';
 
-const BUCKET_NAME = 'memory-mount';
-
-export async function createFile(trophyId: string, fileName: string, file: any) {
-    // const { folder, fileName, content } = req.body;
-    const folder = 'memory-mount';
-
+export async function createFile(trophyId: string, fileName: string, file: ReadStream) {
     const files = await listFiles(trophyId);
-    console.log('files: ', files);
+    console.log('files: ', files.length);
     if (files.length > 0) {
         await emptyBucket(files);
     }
@@ -25,7 +21,6 @@ export async function createFile(trophyId: string, fileName: string, file: any) 
             console.log(`Percentage ${progressEvent.percentage}%`);
         },
     });
-    console.log('blob: ', blob);
     return blob;
 }
 
@@ -36,7 +31,6 @@ export const listFiles = async (folder: string) => {
             token,
             prefix: `${folder}`,
         });
-        console.log('response: ', response);
         return response?.blobs || [];
     } catch (error) {
         console.error("Error listing files:", error);
@@ -44,11 +38,11 @@ export const listFiles = async (folder: string) => {
     }
 }
 
-export const emptyBucket = async (files: any[]) => {
+export const emptyBucket = async (files: unknown[]) => {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
     console.log('Deleting files with token: ', token);
     return Promise.all(files.map(async (file) => {
-        await del(file.url, {
+        await del((file as { url: string }).url, {
             token,
         });
     }));

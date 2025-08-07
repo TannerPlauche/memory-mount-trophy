@@ -1,23 +1,29 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { redirect } from 'next/navigation';
 
 // get trophies
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET() {
     console.log('getTrophies called');
     return redirect('/trophy');
 }
 
 // create trophy
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-    return res.status(201).json({ message: 'POST request successful' });
+export async function POST() {
+    return new Response(JSON.stringify({ message: 'POST request successful' }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' }
+    });
 }
 
-// update trophy
-export async function PUT(req: NextApiRequest, res: NextApiResponse) {
-    return res.status(200).json({ message: 'PUT request successful' });
+export async function PUT() {
+    return new Response(JSON.stringify({ message: 'PUT request successful' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
 }
 
-// delete trophy
-export async function DELETE(req: NextApiRequest, res: NextApiResponse) {
-    return res.status(200).json({ message: 'DELETE request successful' });
+export async function DELETE() {
+    return new Response(JSON.stringify({ message: 'DELETE request successful' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
 }

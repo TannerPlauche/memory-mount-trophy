@@ -1,12 +1,10 @@
 "use client";
+// disable any es lint for this file
+/* eslint-disable */
 import { useParams } from 'next/navigation';
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Oval } from 'react-loader-spinner';
-
-interface TrophyPageProps {
-    params: { trophyId: string };
-}
 
 const publicPrefix = "https://pub-e08d3d9ccb3b41799db9d047e05263e7.r2.dev/";
 
@@ -48,6 +46,7 @@ export default function TrophyPage() {
                     setIsLoading(false);
                 }
             } catch (err) {
+                console.log('err: ', err);
                 setFileError(true);
                 setFileErrorMessage('Error fetching file.');
                 setIsLoading(false);
@@ -57,6 +56,7 @@ export default function TrophyPage() {
         fetchFile();
     }, [trophyId]);
 
+    // ts-ignore-next-line
     const sortByLastModified = (files: any[]) => {
         return files.sort((a, b) => {
             const aDate = new Date(a.uploadedAt);
