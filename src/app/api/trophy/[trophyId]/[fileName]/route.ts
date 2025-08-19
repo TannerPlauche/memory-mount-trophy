@@ -6,12 +6,10 @@ interface Params {
 }
 
 export async function POST(request: Request, { params }: Params): Promise<NextResponse> {
-    const { trophyId, fileName } = await params;
-    console.log('fileName: ', fileName);
-    console.log('trophyId: ', trophyId);
+    const { trophyId } = await params;
+    const { fileName } = await params;
 
     const body = (await request.json()) as HandleUploadBody;
-    console.log('body: ', body);
     const token = process.env.BLOB_READ_WRITE_TOKEN;
 
     if (!token) {
@@ -20,42 +18,42 @@ export async function POST(request: Request, { params }: Params): Promise<NextRe
             { status: 500 },
         );
     }
-    const pathname = `/${trophyId}/${fileName}`;
     try {
         const jsonResponse = await handleUpload({
             body,
             request,
             token,
             onBeforeGenerateToken: async (pathName, clientPayload) => {
-                console.log('clientPayload: ', clientPayload);
-                console.log('pathName: ', pathName);
                 return {
                     pathname: `/${clientPayload}`,
                     allowedContentTypes: ['video/*', 'image/*'],
                     tokenPayload: JSON.stringify({
-                        clientPayload: `/${trophyId}`
+                        trophyId,
+                        fileName
                     }),
                 };
             },
-            onUploadCompleted: async ({ blob, tokenPayload }) => {
+            onUploadCompleted: async ({ blob: _blob, tokenPayload }) => {
                 // Get notified of client upload completion
                 // ⚠️ This will not work on `localhost` websites,
                 // Use ngrok or similar to get the full upload flow
-
-                console.log('blob upload completed', blob, tokenPayload);
-
+                
                 try {
                     // Run any logic after the file upload completed
-                    // const { userId } = JSON.parse(tokenPayload);
-                    // await db.update({ avatar: blob.url, userId });
+                    if (tokenPayload) {
+                        const payload = JSON.parse(tokenPayload);
+                        console.log('Upload completed for trophy:', payload.trophyId, 'file:', payload.fileName);
+                    }
                 } catch (error) {
-                    throw new Error('Could not update user');
+                    console.error('Error processing upload completion:', error);
+                    throw new Error('Could not process upload completion');
                 }
             },
         });
 
         return NextResponse.json(jsonResponse);
     } catch (error) {
+        console.error('Upload handler error:', error);
         return NextResponse.json(
             { error: (error as Error).message },
             { status: 400 }, // The webhook will retry 5 times waiting for a 200

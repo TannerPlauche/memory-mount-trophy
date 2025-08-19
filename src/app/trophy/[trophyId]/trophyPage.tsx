@@ -11,20 +11,60 @@ import { imageFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '@/app/
 import { sortFiles, validateFiles } from '@/app/services/file.service';
 
 import "yet-another-react-lightbox/styles.css";
+
 const publicPrefix = process.env.PUBLIC_PREFIX;
-console.log('publicPrefix: ', publicPrefix);
+
+// Reusable Loading Spinner Component
+const LoadingSpinner = ({ isFullScreen = false, message = "Loading" }: { isFullScreen?: boolean; message?: string }) => {
+    const spinnerContent = (
+        <>
+            <h2 className='pb-10 text-xl'>{message}</h2>
+            <Oval
+                visible={true}
+                height="180"
+                width="180"
+                color="#4fa94d"
+                ariaLabel="oval-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+            />
+        </>
+    );
+
+    if (isFullScreen) {
+        return (
+            <div className="flex flex-col items-center align-center justify-baseline min-h-screen fixed top-10 left-0 right-0">
+                <div className='bg-gray-600 p-10 rounded-lg shadow-lg text-center'>
+                    {spinnerContent}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-900">
+            <Oval
+                visible={true}
+                height="80"
+                width="80"
+                color="#4fa94d"
+                ariaLabel="oval-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+            />
+        </div>
+    );
+};
 
 export default function TrophyPage() {
     const { trophyId } = useParams();
-    console.log('trophyId: ', trophyId);
     const [fileError, setFileError] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [fileErrorMessage, setFileErrorMessage] = useState<string>('');
-    const [imageErrorMessage, setimageErrorMessage] = useState<string>('');
+    const [imageErrorMessage, setImageErrorMessage] = useState<string>('');
     const [videoFile, setVideoFile] = useState<iTrophyFile | null>(null);
     const [imageFiles, setImageFiles] = useState<iTrophyFile[]>([]);
     const [slides, setSlides] = useState<{ src: string; width: number; height: number }[]>([]);
-    // const [videoBlob, setVideoBlob] = useState<PutBlobResult | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isUploading, setIsUploading] = useState(false);
     const [lightboxIsOpen, setLightboxIsOpen] = useState(false);
@@ -39,42 +79,46 @@ export default function TrophyPage() {
         const fetchFiles = async () => {
             try {
                 const response = await axios.get(`/api/trophy/${trophyId}`);
-                console.log('response: ', response);
+                
                 if (response.data.error) {
                     setFileError(true);
                     setFileErrorMessage(response.data.error);
-                    setIsLoading(false);
                 } else if (response.data?.length > 0) {
                     const sortedFiles = sortByLastModified(response.data);
                     const { videoFiles, imageFiles } = sortFiles(sortedFiles);
-                    console.log('sortedFiles: ', sortedFiles);
-                    // Assuming the first file is the most recent one
+                    
                     setFileError(false);
                     setFileErrorMessage('');
-                    // Use the first file in the sorted list
-                    console.log('response.data[0]: ', response.data[0]);
-                    console.log('publicPrefix: ', publicPrefix);
-                    // Create a file object with the public URL and name
-                    const videoFileWithUrl = {
-                        ...videoFiles[0],
-                        publicUrl: publicPrefix + videoFiles[0].Key,
-                        name: videoFiles[0].Key,
-                    };
-                    setVideoFile(videoFileWithUrl);
-                    setImageFiles(imageFiles.map((file) => ({
+                    
+                    // Set video file if available
+                    if (videoFiles.length > 0) {
+                        const videoFileWithUrl = {
+                            ...videoFiles[0],
+                            publicUrl: publicPrefix + videoFiles[0].Key,
+                            name: videoFiles[0].Key,
+                        };
+                        setVideoFile(videoFileWithUrl);
+                    }
+                    
+                    // Set image files and slides
+                    const processedImageFiles = imageFiles.map((file) => ({
                         ...file,
                         publicUrl: publicPrefix + file.Key,
                         name: file.Key,
+                    }));
+                    
+                    setImageFiles(processedImageFiles);
+                    setSlides(imageFiles.map((imageFile) => ({
+                        src: imageFile.url, 
+                        width: 800, 
+                        height: 600 
                     })));
-                    setSlides(imageFiles.map((imageFile) => (
-                        { src: imageFile.url, width: 800, height: 600 }
-                    )));
-                    setIsLoading(false);
                 }
             } catch (err) {
-                console.log('err: ', err);
+                console.log('Error fetching files:', err);
                 setFileError(true);
                 setFileErrorMessage('No file uploaded. Please upload a file.');
+            } finally {
                 setIsLoading(false);
             }
         };
@@ -82,8 +126,7 @@ export default function TrophyPage() {
         fetchFiles();
     }, [trophyId]);
 
-    // ts-ignore-next-line
-    const sortByLastModified = (files: any[]) => {
+    const sortByLastModified = (files: iTrophyFile[]) => {
         return files.sort((a, b) => {
             const aDate = new Date(a.uploadedAt);
             const bDate = new Date(b.uploadedAt);
@@ -114,11 +157,11 @@ export default function TrophyPage() {
 
             if (largeImages.length > 0) {
                 setImageError(true);
-                setimageErrorMessage('Image files must be smaller than 10MB.');
+                setImageErrorMessage('Image files must be smaller than 10MB.');
                 input.value = ''; // Clear the input
             } else {
                 setImageError(false);
-                setimageErrorMessage('');
+                setImageErrorMessage('');
             }
 
         }
@@ -167,18 +210,15 @@ export default function TrophyPage() {
         try {
             if (selectedVideoFile) {
                 const videoFileType = selectedVideoFile.name.split('.').pop() || 'mp4'; // Default to mp4 if no extension
-                console.log('video fileType: ', videoFileType);
                 const renamedFile = new File([selectedVideoFile], `${safeFileName}.${videoFileType}`, { type: videoFileType });
-                console.log('renamedFile: ', renamedFile);
-                const newBlob = await upload(`/${trophyId}/${renamedFile.name}`, renamedFile, {
+                await upload(`/${trophyId}/${renamedFile.name}`, renamedFile, {
                     access: 'public',
                     handleUploadUrl: `/api/trophy/${trophyId}/${safeFileName}`,
                 });
-                console.log('newBlob: ', newBlob);
             }
 
             if (selectedImageFiles) {
-                const imageBlobs = await Promise.all(selectedImageFiles.map(async (imageFile) => {
+                await Promise.all(selectedImageFiles.map(async (imageFile) => {
                     const imageFileType = imageFile.name.split('.').pop() || 'jpg'; // Default to jpg if no extension
                     const safeImageName = imageFile.name.replace(/[\\/\s-]/g, "_");
                     const renamedImageFile = new File([imageFile], `${safeImageName}.${imageFileType}`, { type: imageFileType });
@@ -187,7 +227,6 @@ export default function TrophyPage() {
                         handleUploadUrl: `/api/trophy/${trophyId}/${safeImageName}`,
                     });
                 }));
-                console.log('imageBlobs: ', imageBlobs);
             }
 
             setIsUploading(false);
@@ -197,10 +236,7 @@ export default function TrophyPage() {
             setFileError(true);
             setFileErrorMessage('Error uploading file. Please try again.');
             setIsUploading(false);
-            return;
         }
-
-        setIsLoading(false);
     }
 
     const replaceVideo = () => {
@@ -210,16 +246,14 @@ export default function TrophyPage() {
             return;
         }
 
+        // Reset video state
         setVideoFile(null);
         setFileError(false);
         setFileErrorMessage('');
 
+        // Clear form inputs
         if (fileNameRef.current) {
             fileNameRef.current.value = '';
-        }
-
-        if (videoInputRef.current && videoInputRef.current.files) {
-            videoInputRef.current.files = new DataTransfer().files;
         }
 
         if (videoInputRef.current) {
@@ -260,21 +294,7 @@ export default function TrophyPage() {
                             <h2 className="text-xl font-semibold text-white mb-4">
                                 Upload a Trophy Video
                             </h2>
-                            {isUploading && (<div className="flex flex-col items-center align-center justify-baseline min-h-screen fixed top-10 left-0 right-0">
-                                <div className='bg-gray-600 p-10 rounded-lg shadow-lg text-center'>
-                                    <h2 className='pb-10 text-xl'>Uploading</h2>
-                                    <Oval
-                                        visible={true}
-                                        height="180"
-                                        width="180"
-                                        color="#4fa94d"
-                                        ariaLabel="oval-loading"
-                                        wrapperStyle={{}}
-                                        wrapperClass=""
-                                    />
-                                </div>
-                            </div>
-                            )}
+                            {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
                             <form className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -303,7 +323,13 @@ export default function TrophyPage() {
                                         className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
                                     />
                                 </div>
-
+                                <button
+                                    type="button"
+                                    onClick={uploadFiles}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                >
+                                    Submit Trophy Video
+                                </button>
                             </form>
 
                         </section>
@@ -341,30 +367,11 @@ export default function TrophyPage() {
                             <h2 className="text-xl font-semibold text-white mb-4">
                                 Upload Trophy Images
                             </h2>
-                            {isUploading && (<div className="flex flex-col items-center align-center justify-baseline min-h-screen fixed top-10 left-0 right-0">
-                                <div className='bg-gray-600 p-10 rounded-lg shadow-lg text-center'>
-                                    <h2 className='pb-10 text-xl'>Uploading</h2>
-                                    <Oval
-                                        visible={true}
-                                        height="180"
-                                        width="180"
-                                        color="#4fa94d"
-                                        ariaLabel="oval-loading"
-                                        wrapperStyle={{}}
-                                        wrapperClass=""
-                                    />
-                                </div>
-                            </div>
-                            )}
+                            {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
                             <form className="space-y-4">
                                 {imageError && (
                                     <div className="text-red-400 text-sm">{imageErrorMessage}</div>
                                 )}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                                        Trophy Name
-                                    </label>
-                                </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">
                                         Upload Images
@@ -380,14 +387,14 @@ export default function TrophyPage() {
                                         className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
                                     />
                                 </div>
+                                <button
+                                    type="button"
+                                    onClick={uploadFiles}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                >
+                                    Submit Trophy Images
+                                </button>
                             </form>
-                            <button
-                                type="button"
-                                onClick={uploadFiles}
-                                className="mt-5 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                            >
-                                Submit
-                            </button>
                         </section>
                     ) : (
                         <section>
@@ -410,33 +417,24 @@ export default function TrophyPage() {
                                 }}
                                 inline={{
                                     style: {
-                                        // width: "100%",
-                                        // maxWidth: "900px",
                                         aspectRatio: "3 / 2",
                                         margin: "0 auto",
                                     },
                                 }}
-                                slides={
-                                    slides
-                                }
+                                slides={slides}
                             />
 
-                            <Lightbox
-                                open={lightboxIsOpen}
-                                close={() => toggleOpen(false)}
-                                index={index}
-                                slides={slides}
-                                on={{ view: updateIndex(true) }}
-                                animation={{ fade: 0 }}
-                                controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
-                            />
-                            {/* <ul className="mb-4 space-y-2">
-                                {imageFiles.map((imageFile, index) => (
-                                    <li key={index}>
-                                        <img src={imageFile.url} alt={imageFile.name} />
-                                    </li>
-                                ))}
-                            </ul> */}
+                            {lightboxIsOpen && (
+                                <Lightbox
+                                    open={lightboxIsOpen}
+                                    close={() => toggleOpen(false)}
+                                    index={index}
+                                    slides={slides}
+                                    on={{ view: updateIndex(true) }}
+                                    animation={{ fade: 0 }}
+                                    controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
+                                />
+                            )}
                         </section>
                     )}
                 </div>
@@ -449,17 +447,7 @@ export default function TrophyPage() {
                 }
             </div>
         ) : (
-            <div className="flex items-center justify-center min-h-screen bg-gray-900">
-                <Oval
-                    visible={true}
-                    height="80"
-                    width="80"
-                    color="#4fa94d"
-                    ariaLabel="oval-loading"
-                    wrapperStyle={{}}
-                    wrapperClass=""
-                />
-            </div>
+            <LoadingSpinner />
         )
     );
 }
