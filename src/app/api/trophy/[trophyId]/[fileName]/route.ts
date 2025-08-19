@@ -31,7 +31,7 @@ export async function POST(request: Request, { params }: Params): Promise<NextRe
                 console.log('pathName: ', pathName);
                 return {
                     pathname: `/${clientPayload}`,
-                    allowedContentTypes: ['video/*'],
+                    allowedContentTypes: ['video/*', 'image/*'],
                     tokenPayload: JSON.stringify({
                         clientPayload: `/${trophyId}`
                     }),
