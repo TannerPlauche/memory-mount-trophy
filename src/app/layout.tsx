@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import logo from '../../public/assets/memoryMountLogoSimple.png';
+import Image from "next/image";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="bg-gray-500 flex items-center justify-center py-4">
+          <Image src={logo} alt="Logo" height={150} />
+        </div>
         {children}
       </body>
     </html>

@@ -278,7 +278,6 @@ export default function TrophyPage() {
             <div className="min-h-screen bg-gray-900 py-10 px-4 md:px-10 text-gray-100">
                 <div className="max-w-3xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6 space-y-6">
                     <header className="border-b border-gray-700 pb-4">
-                        <h1 className="text-3xl font-bold text-white">Memory Mount</h1>
                         <p className="text-gray-400 text-sm mt-1">
                             Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
                         </p>
