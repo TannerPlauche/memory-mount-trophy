@@ -79,17 +79,17 @@ export default function TrophyPage() {
         const fetchFiles = async () => {
             try {
                 const response = await axios.get(`/api/trophy/${trophyId}`);
-                
+
                 if (response.data.error) {
                     setFileError(true);
                     setFileErrorMessage(response.data.error);
                 } else if (response.data?.length > 0) {
                     const sortedFiles = sortByLastModified(response.data);
                     const { videoFiles, imageFiles } = sortFiles(sortedFiles);
-                    
+
                     setFileError(false);
                     setFileErrorMessage('');
-                    
+
                     // Set video file if available
                     if (videoFiles.length > 0) {
                         const videoFileWithUrl = {
@@ -99,19 +99,19 @@ export default function TrophyPage() {
                         };
                         setVideoFile(videoFileWithUrl);
                     }
-                    
+
                     // Set image files and slides
                     const processedImageFiles = imageFiles.map((file) => ({
                         ...file,
                         publicUrl: publicPrefix + file.Key,
                         name: file.Key,
                     }));
-                    
+
                     setImageFiles(processedImageFiles);
                     setSlides(imageFiles.map((imageFile) => ({
-                        src: imageFile.url, 
-                        width: 800, 
-                        height: 600 
+                        src: imageFile.url,
+                        width: 800,
+                        height: 600
                     })));
                 }
             } catch (err) {
@@ -292,7 +292,7 @@ export default function TrophyPage() {
                     {!videoFile ? (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
-                                Upload a Trophy Video
+                                Select a Trophy Video
                             </h2>
                             {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
                             <form className="space-y-4">
@@ -323,13 +323,6 @@ export default function TrophyPage() {
                                         className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
                                     />
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={uploadFiles}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                                >
-                                    Submit Trophy Video
-                                </button>
                             </form>
 
                         </section>
@@ -365,7 +358,7 @@ export default function TrophyPage() {
                     {!imageFiles.length ? (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
-                                Upload Trophy Images
+                                Select Trophy Images
                             </h2>
                             {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
                             <form className="space-y-4">
@@ -392,7 +385,7 @@ export default function TrophyPage() {
                                     onClick={uploadFiles}
                                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                 >
-                                    Submit Trophy Images
+                                    Submit
                                 </button>
                             </form>
                         </section>
