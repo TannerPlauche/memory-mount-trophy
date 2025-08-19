@@ -4,16 +4,16 @@ import { iTrophyFile } from '../shared/types/types';
 import { imageFileTypes, videoFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '../shared/constants/constants';
 import axios from 'axios';
 
-export async function createFile(trophyId: string, fileName: string, file: ReadStream): Promise<any> {
+export async function createFile(trophyId: string, fileName: string, file: ReadStream) {
     if (!trophyId || !fileName || !file) {
         throw new Error('Missing required parameters: trophyId, fileName, or file');
     }
 
     const files = await listFiles(trophyId);
     console.log('Existing files count:', files.length);
-    
+
     if (files.length > 0) {
-        await emptyBucket(files);
+        await emptyBucket(files as iTrophyFile[]);
     }
 
     const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -29,7 +29,7 @@ export async function createFile(trophyId: string, fileName: string, file: ReadS
             console.log(`Upload progress: ${progressEvent.percentage}% (${progressEvent.loaded}/${progressEvent.total} bytes)`);
         },
     });
-    
+
     return blob;
 }
 
@@ -73,7 +73,7 @@ export const deleteTrophyFile = async (trophyId: string, file: iTrophyFile): Pro
     }
 };
 
-export const listFiles = async (folder: string): Promise<any[]> => {
+export const listFiles = async (folder: string) => {
     try {
         if (!folder) {
             throw new Error('Folder name is required');
@@ -88,7 +88,7 @@ export const listFiles = async (folder: string): Promise<any[]> => {
             token,
             prefix: `${folder}`,
         });
-        
+
         return response?.blobs || [];
     } catch (error) {
         console.error("Error listing files:", error);
@@ -96,7 +96,7 @@ export const listFiles = async (folder: string): Promise<any[]> => {
     }
 };
 
-export const emptyBucket = async (files: any[]): Promise<void> => {
+export const emptyBucket = async (files: iTrophyFile[]) => {
     if (!files || files.length === 0) {
         return;
     }
@@ -107,7 +107,7 @@ export const emptyBucket = async (files: any[]): Promise<void> => {
     }
 
     console.log('Deleting files, count:', files.length);
-    
+
     await Promise.all(files.map(async (file) => {
         if (file && file.url) {
             await del(file.url, { token });
@@ -133,10 +133,10 @@ export const getFileType = (file: iTrophyFile | File): string => {
     return '';
 };
 
-export const sortFiles = (files: (File | iTrophyFile)[]): { 
-    videoFiles: (File | iTrophyFile)[], 
-    imageFiles: (File | iTrophyFile)[], 
-    otherFiles: (File | iTrophyFile)[] 
+export const sortFiles = (files: (File | iTrophyFile)[]): {
+    videoFiles: (File | iTrophyFile)[],
+    imageFiles: (File | iTrophyFile)[],
+    otherFiles: (File | iTrophyFile)[]
 } => {
     if (!files || files.length === 0) {
         return { videoFiles: [], imageFiles: [], otherFiles: [] };
@@ -144,8 +144,8 @@ export const sortFiles = (files: (File | iTrophyFile)[]): {
 
     const videoFiles = files.filter(file => videoFileTypes.includes(getFileType(file)));
     const imageFiles = files.filter(file => imageFileTypes.includes(getFileType(file)));
-    const otherFiles = files.filter(file => 
-        !imageFileTypes.includes(getFileType(file)) && 
+    const otherFiles = files.filter(file =>
+        !imageFileTypes.includes(getFileType(file)) &&
         !videoFileTypes.includes(getFileType(file))
     );
 
@@ -190,14 +190,14 @@ export const validateFiles = (files: File[]): { valid: boolean; message?: string
     // Check file sizes
     for (const file of files) {
         const fileType = getFileType(file);
-        
+
         if (videoFileTypes.includes(fileType) && file.size > MAX_VIDEO_FILE_SIZE) {
             return {
                 valid: false,
                 message: `Video file "${file.name}" exceeds maximum size of ${MAX_VIDEO_FILE_SIZE / (1024 * 1024 * 1024)}GB.`,
             };
         }
-        
+
         if (imageFileTypes.includes(fileType) && file.size > MAX_IMAGE_FILE_SIZE) {
             return {
                 valid: false,
