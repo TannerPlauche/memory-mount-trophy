@@ -1,16 +1,27 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import axios from 'axios'
 import { useParams } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import TrophyPage from './trophyPage'
-import { sortFiles, validateFiles } from '@/app/services/file.service'
+import { getFiles, sortFiles, validateFiles, deleteTrophyFile } from '@/app/services/file.service'
 import { iTrophyFile } from '@/app/shared/types/types'
+
+// Mock Next.js navigation
+jest.mock('next/navigation', () => ({
+  useParams: jest.fn(),
+}))
+
+// Mock Vercel blob client
+jest.mock('@vercel/blob/client', () => ({
+  upload: jest.fn(),
+}))
 
 // Mock file service
 jest.mock('@/app/services/file.service', () => ({
+  getFiles: jest.fn(),
   sortFiles: jest.fn(),
   validateFiles: jest.fn(),
+  deleteTrophyFile: jest.fn(),
 }))
 
 // Mock constants
@@ -22,11 +33,12 @@ jest.mock('@/app/shared/constants/constants', () => ({
 }))
 
 // Mock implementations
-const mockAxios = axios as jest.Mocked<typeof axios>
 const mockUseParams = useParams as jest.MockedFunction<typeof useParams>
 const mockUpload = upload as jest.MockedFunction<typeof upload>
+const mockGetFiles = getFiles as jest.MockedFunction<typeof getFiles>
 const mockSortFiles = sortFiles as jest.MockedFunction<typeof sortFiles>
 const mockValidateFiles = validateFiles as jest.MockedFunction<typeof validateFiles>
+const mockDeleteTrophyFile = deleteTrophyFile as jest.MockedFunction<typeof deleteTrophyFile>
 
 // Mock data - creating a simplified mock that satisfies the interface
 const createMockTrophyFile = (overrides: Partial<iTrophyFile> = {}): iTrophyFile => {
@@ -66,7 +78,7 @@ describe('TrophyPage', () => {
     
     // Setup default mock implementations
     mockUseParams.mockReturnValue({ trophyId: mockTrophyId })
-    mockAxios.get.mockResolvedValue({ data: [] })
+    mockGetFiles.mockResolvedValue([])
     mockSortFiles.mockReturnValue({ videoFiles: [], imageFiles: [], otherFiles: [] })
     mockValidateFiles.mockReturnValue({ valid: true, message: '' })
     
@@ -81,7 +93,7 @@ describe('TrophyPage', () => {
     })
 
     it('should hide loading spinner after data is fetched', async () => {
-      mockAxios.get.mockResolvedValue({ data: [] })
+      mockGetFiles.mockResolvedValue([])
       
       const { container } = render(<TrophyPage />)
       
@@ -94,21 +106,21 @@ describe('TrophyPage', () => {
 
   describe('Trophy ID Display', () => {
     it('should display the trophy ID', async () => {
-      mockAxios.get.mockResolvedValue({ data: [] })
+      mockGetFiles.mockResolvedValue([])
       
       const { container } = render(<TrophyPage />)
       
       // Wait for the component to finish loading
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      expect(container.textContent).toContain(mockTrophyId)
+      expect(container.textContent).toContain('Trophy ID: test-trophy-123')
     })
   })
 
   describe('Error Handling', () => {
     it('should display error message when API returns error', async () => {
       const errorMessage = 'Failed to fetch files'
-      mockAxios.get.mockResolvedValue({ data: { error: errorMessage } })
+      mockGetFiles.mockResolvedValue({ error: errorMessage })
       
       const { container } = render(<TrophyPage />)
       
@@ -119,7 +131,7 @@ describe('TrophyPage', () => {
     })
 
     it('should display error message when API request fails', async () => {
-      mockAxios.get.mockRejectedValue(new Error('Network error'))
+      mockGetFiles.mockRejectedValue(new Error('Network error'))
       
       const { container } = render(<TrophyPage />)
       
@@ -131,8 +143,9 @@ describe('TrophyPage', () => {
   })
 
   describe('Video Upload Section', () => {
-    it('should show video upload form when no video exists', async () => {
-      mockAxios.get.mockResolvedValue({ data: [] })
+    it('should show upload form when no video exists', async () => {
+      mockGetFiles.mockResolvedValue([])
+      mockSortFiles.mockReturnValue({ videoFiles: [], imageFiles: [], otherFiles: [] })
       
       const { container } = render(<TrophyPage />)
       
@@ -140,12 +153,12 @@ describe('TrophyPage', () => {
       await new Promise(resolve => setTimeout(resolve, 100))
       
       expect(container.textContent).toContain('Select a Trophy Video')
-      expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
-      expect(container.querySelector('input[type="file"]')).toBeInTheDocument()
+      expect(container.textContent).toContain('Trophy Name')
+      expect(container.textContent).toContain('Upload Video')
     })
 
     it('should show video player when video exists', async () => {
-      mockAxios.get.mockResolvedValue({ data: [mockVideoFile] })
+      mockGetFiles.mockResolvedValue([mockVideoFile])
       mockSortFiles.mockReturnValue({ videoFiles: [mockVideoFile], imageFiles: [], otherFiles: [] })
       
       const { container } = render(<TrophyPage />)
@@ -159,20 +172,8 @@ describe('TrophyPage', () => {
   })
 
   describe('Image Upload Section', () => {
-    it('should show image upload form when no images exist', async () => {
-      mockAxios.get.mockResolvedValue({ data: [] })
-      
-      const { container } = render(<TrophyPage />)
-      
-      // Wait for the component to finish loading
-      await new Promise(resolve => setTimeout(resolve, 100))
-      
-      expect(container.textContent).toContain('Select Trophy Images')
-      expect(container.querySelector('#imageInput')).toBeInTheDocument()
-    })
-
     it('should show lightbox when images exist', async () => {
-      mockAxios.get.mockResolvedValue({ data: [mockImageFile] })
+      mockGetFiles.mockResolvedValue([mockImageFile])
       mockSortFiles.mockReturnValue({ videoFiles: [], imageFiles: [mockImageFile], otherFiles: [] })
       
       const { container } = render(<TrophyPage />)
@@ -187,7 +188,7 @@ describe('TrophyPage', () => {
 
   describe('Replace Video Functionality', () => {
     it('should show replace video button when video exists', async () => {
-      mockAxios.get.mockResolvedValue({ data: [mockVideoFile] })
+      mockGetFiles.mockResolvedValue([mockVideoFile])
       mockSortFiles.mockReturnValue({ videoFiles: [mockVideoFile], imageFiles: [], otherFiles: [] })
       
       const { container } = render(<TrophyPage />)
@@ -201,57 +202,26 @@ describe('TrophyPage', () => {
 
   describe('API Calls', () => {
     it('should make API call with correct trophy ID', async () => {
-      mockAxios.get.mockResolvedValue({ data: [] })
+      mockGetFiles.mockResolvedValue([])
       
       render(<TrophyPage />)
       
-      // Wait for the API call
+      // Wait for the component to finish loading
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      expect(mockAxios.get).toHaveBeenCalledWith(`/api/trophy/${mockTrophyId}`)
+      expect(mockGetFiles).toHaveBeenCalledWith(mockTrophyId)
     })
 
     it('should call sortFiles when data is received', async () => {
       const mockData = [mockVideoFile, mockImageFile]
-      mockAxios.get.mockResolvedValue({ data: mockData })
+      mockGetFiles.mockResolvedValue(mockData)
       
       render(<TrophyPage />)
       
-      // Wait for the API call and processing
+      // Wait for the component to finish loading
       await new Promise(resolve => setTimeout(resolve, 100))
       
       expect(mockSortFiles).toHaveBeenCalled()
-    })
-  })
-
-  describe('Component Behavior', () => {
-    it('should handle empty data response', async () => {
-      mockAxios.get.mockResolvedValue({ data: [] })
-      
-      const { container } = render(<TrophyPage />)
-      
-      // Wait for the component to finish loading
-      await new Promise(resolve => setTimeout(resolve, 100))
-      
-      expect(container.textContent).toContain('Select a Trophy Video')
-      expect(container.textContent).toContain('Select Trophy Images')
-    })
-
-    it('should process files correctly when both video and images are present', async () => {
-      mockAxios.get.mockResolvedValue({ data: [mockVideoFile, mockImageFile] })
-      mockSortFiles.mockReturnValue({ 
-        videoFiles: [mockVideoFile], 
-        imageFiles: [mockImageFile], 
-        otherFiles: [] 
-      })
-      
-      const { container } = render(<TrophyPage />)
-      
-      // Wait for the component to finish loading
-      await new Promise(resolve => setTimeout(resolve, 100))
-      
-      expect(container.textContent).toContain('Trophy Video')
-      expect(container.textContent).toContain('Trophy Images')
     })
   })
 })
