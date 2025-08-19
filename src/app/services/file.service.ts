@@ -2,6 +2,7 @@ import { del, list, put } from '@vercel/blob';
 import { ReadStream } from 'fs';
 import { iTrophyFile } from '../shared/types/types';
 import { imageFileTypes, videoFileTypes } from '../shared/constants/constants';
+import axios from 'axios';
 
 export async function createFile(trophyId: string, fileName: string, file: ReadStream) {
     const files = await listFiles(trophyId);
@@ -25,6 +26,26 @@ export async function createFile(trophyId: string, fileName: string, file: ReadS
     });
     return blob;
 }
+
+export const getFiles = async (trophyId: string) => {
+    const response = await axios.get(`/api/trophy/${trophyId}`);
+    return response.data;
+}
+
+export const deleteTrophyFile = async (trophyId: string, file: iTrophyFile) => {
+    console.log('file: ', file);
+    // await del(file.pathname, { token });
+    const encoded = encodeURIComponent(file.downloadUrl);
+
+    const response = await axios.delete(`/api/trophy/${trophyId}/delete`, {
+        params: {
+            downloadUrl: encoded
+        }
+    });
+
+    return { success: true };
+};
+
 
 export const listFiles = async (folder: string) => {
     try {

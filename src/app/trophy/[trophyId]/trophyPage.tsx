@@ -8,9 +8,10 @@ import Inline from "yet-another-react-lightbox/plugins/inline";
 import { upload } from '@vercel/blob/client';
 import { iTrophyFile } from '@/app/shared/types/types';
 import { imageFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '@/app/shared/constants/constants';
-import { sortFiles, validateFiles } from '@/app/services/file.service';
+import { deleteTrophyFile, getFiles, sortFiles, validateFiles } from '@/app/services/file.service';
 
 import "yet-another-react-lightbox/styles.css";
+import Modal from '@/app/components/Modal';
 
 const publicPrefix = process.env.PUBLIC_PREFIX;
 
@@ -69,7 +70,17 @@ export default function TrophyPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [lightboxIsOpen, setLightboxIsOpen] = useState(false);
     const [index, setIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedSize, setSelectedSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
 
+    const openModal = (size: 'sm' | 'md' | 'lg' | 'xl') => {
+        setSelectedSize(size);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
     // useRef to hold the file input element
     const videoInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -78,13 +89,19 @@ export default function TrophyPage() {
     useEffect(() => {
         const fetchFiles = async () => {
             try {
-                const response = await axios.get(`/api/trophy/${trophyId}`);
-
-                if (response.data.error) {
+                // const response = await axios.get(`/api/trophy/${trophyId}`);
+                if (typeof trophyId !== 'string') {
                     setFileError(true);
-                    setFileErrorMessage(response.data.error);
-                } else if (response.data?.length > 0) {
-                    const sortedFiles = sortByLastModified(response.data);
+                    setFileErrorMessage('Invalid trophy ID.');
+                    setIsLoading(false);
+                    return;
+                }
+                const fileData = await getFiles(trophyId);
+                if (fileData.error) {
+                    setFileError(true);
+                    setFileErrorMessage(fileData.error);
+                } else if (fileData?.length > 0) {
+                    const sortedFiles = sortByLastModified(fileData);
                     const { videoFiles, imageFiles } = sortFiles(sortedFiles);
 
                     setFileError(false);
@@ -221,7 +238,7 @@ export default function TrophyPage() {
                 await Promise.all(selectedImageFiles.map(async (imageFile) => {
                     const imageFileType = imageFile.name.split('.').pop() || 'jpg'; // Default to jpg if no extension
                     const safeImageName = imageFile.name.replace(/[\\/\s-]/g, "_");
-                    const renamedImageFile = new File([imageFile], `${safeImageName}.${imageFileType}`, { type: imageFileType });
+                    const renamedImageFile = new File([imageFile], `${safeImageName}`, { type: imageFileType });
                     return await upload(`/${trophyId}/${renamedImageFile.name}`, renamedImageFile, {
                         access: 'public',
                         handleUploadUrl: `/api/trophy/${trophyId}/${safeImageName}`,
@@ -238,6 +255,23 @@ export default function TrophyPage() {
             setIsUploading(false);
         }
     }
+
+    const deleteImage = async (file: iTrophyFile) => {
+        const confirmed = confirm(`Are you sure you want to delete ${file.name}? This action cannot be undone.`);
+        if (confirmed) {
+            // Call the delete API or function here
+            const success = await deleteTrophyFile(trophyId as string, file);
+            if (success) {
+                const updatedImageFiles = imageFiles.filter((img) => img.downloadUrl !== file.downloadUrl);
+                setImageFiles(updatedImageFiles);
+                setSlides(updatedImageFiles.map((imageFile) => ({
+                    src: imageFile.url,
+                    width: 800,
+                    height: 600
+                })));
+            }
+        }
+    };
 
     const replaceVideo = () => {
         const replacePrompt = confirm('Are you sure you want to replace the video? This will remove the current video.');
@@ -427,17 +461,79 @@ export default function TrophyPage() {
                                     controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
                                 />
                             )}
+
+                            <Modal
+                                isOpen={isModalOpen}
+                                onClose={closeModal}
+                                title="Delete Images"
+                                size={selectedSize}
+                            >
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
+                                        {imageFiles.map((imageFile) => (
+                                            <div key={imageFile.name} className="flex flex-col space-y-2">
+                                                <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
+                                                <div className="relative inline-block w-32 h-32">
+                                                    <img src={imageFile.url} alt={imageFile.name} className="w-32 h-32 object-cover rounded" />
+                                                    <button
+                                                        onClick={() => deleteImage(imageFile)}
+                                                        className="delete-image absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 transition-colors"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex space-x-3">
+                                    <button
+                                        onClick={closeModal}
+                                        className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={closeModal}
+                                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                                {/* </div> */}
+                                {/* </div> */}
+                            </Modal>
                         </section>
                     )}
+                </div >
+                                <div className='edits flex flex-col gap-2 items-start mt-4'>
+                    {!!videoFile && <a
+                        className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
+                        onClick={() => replaceVideo()}
+                    >
+                        Replace Video
+                    </a>
+                    }
+
+                    {!!imageFiles.length && <a
+                        className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
+                        onClick={() => openModal('md')}
+                    >
+                        Edit Images
+                    </a>
+                    }
+
+                    {!!imageFiles.length && <a
+                        className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
+                        onClick={() => setImageFiles([])}
+                    >
+                        Add Images
+                    </a>
+                    }
+
                 </div>
-                {!!videoFile && <a
-                    className="inline-block mt-2 text-blue-400 hover:underline text-sm fixed bottom-5"
-                    onClick={() => replaceVideo()}
-                >
-                    Replace Video
-                </a>
-                }
-            </div>
+            </div >
         ) : (
             <LoadingSpinner />
         )
