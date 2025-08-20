@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Trophy Mount",
-  description: "Watch your trophy hunt",
+  title: "Memory Mount",
+  description: "Re-live every hunt",
 };
 
 export default function RootLayout({
