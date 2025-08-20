@@ -2,6 +2,7 @@
 import {
     createFile,
     getFiles,
+    deleteFile,
     listFiles,
     getFileType,
     sortFiles,
@@ -34,7 +35,7 @@ describe('file.service', () => {
     describe('createFile', () => {
         it('should create a file successfully', async () => {
             const mockFile = { pipe: jest.fn() } as any;
-            const mockBlob = {
+            const mockBlob = { 
                 url: 'https://test.com/file.mp4',
                 downloadUrl: 'https://test.com/file.mp4',
                 pathname: '/trophy123/test.mp4',
@@ -42,7 +43,7 @@ describe('file.service', () => {
                 contentDisposition: 'inline'
             };
 
-            mockedList.mockResolvedValue({
+            mockedList.mockResolvedValue({ 
                 blobs: [],
                 hasMore: false,
                 cursor: undefined
@@ -77,7 +78,7 @@ describe('file.service', () => {
             delete process.env.BLOB_READ_WRITE_TOKEN;
             const mockFile = { pipe: jest.fn() } as any;
 
-            mockedList.mockResolvedValue({
+            mockedList.mockResolvedValue({ 
                 blobs: [],
                 hasMore: false,
                 cursor: undefined
@@ -88,7 +89,7 @@ describe('file.service', () => {
 
         it('should empty bucket if files exist', async () => {
             const mockFile = { pipe: jest.fn() } as any;
-            const mockBlob = {
+            const mockBlob = { 
                 url: 'https://test.com/file.mp4',
                 downloadUrl: 'https://test.com/file.mp4',
                 pathname: '/trophy123/test.mp4',
@@ -103,7 +104,7 @@ describe('file.service', () => {
                 uploadedAt: new Date()
             }];
 
-            mockedList.mockResolvedValue({
+            mockedList.mockResolvedValue({ 
                 blobs: existingFiles,
                 hasMore: false,
                 cursor: undefined
@@ -198,14 +199,14 @@ describe('file.service', () => {
     describe('listFiles', () => {
         it('should list files successfully', async () => {
             const mockFiles = [
-                {
+                { 
                     url: 'https://test.com/test1.mp4',
                     downloadUrl: 'https://test.com/test1.mp4',
                     pathname: '/trophy123/test1.mp4',
                     size: 1000,
                     uploadedAt: new Date()
                 },
-                {
+                { 
                     url: 'https://test.com/test2.jpg',
                     downloadUrl: 'https://test.com/test2.jpg',
                     pathname: '/trophy123/test2.jpg',
@@ -213,7 +214,7 @@ describe('file.service', () => {
                     uploadedAt: new Date()
                 }
             ];
-            mockedList.mockResolvedValue({
+            mockedList.mockResolvedValue({ 
                 blobs: mockFiles,
                 hasMore: false,
                 cursor: undefined
@@ -229,7 +230,7 @@ describe('file.service', () => {
         });
 
         it('should return empty array when no files exist', async () => {
-            mockedList.mockResolvedValue({
+            mockedList.mockResolvedValue({ 
                 blobs: [],
                 hasMore: false,
                 cursor: undefined
