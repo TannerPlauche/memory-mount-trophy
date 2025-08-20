@@ -4,5 +4,6 @@ export interface iTrophyFile extends File {
     Key: string;
     downloadUrl: string;
     url: string;
-    name: string
+    name: string;
+    error?: string;
 }

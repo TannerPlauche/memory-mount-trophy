@@ -1,4 +1,4 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     createFile,
     getFiles,
@@ -136,7 +136,7 @@ describe('file.service', () => {
         it('should return error when trophy ID is missing', async () => {
             const result = await getFiles('');
 
-            expect(result).toEqual({ error: 'Failed to fetch files' });
+            expect(result).toEqual([]);
         });
 
         it('should handle API errors gracefully', async () => {
@@ -144,7 +144,7 @@ describe('file.service', () => {
 
             const result = await getFiles('trophy123');
 
-            expect(result).toEqual({ error: 'Failed to fetch files' });
+            expect(result).toEqual([]);
         });
     });
 

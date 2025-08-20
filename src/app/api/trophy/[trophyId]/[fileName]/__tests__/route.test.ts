@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { handleUpload } from '@vercel/blob/client';
 import { del } from '@vercel/blob';
@@ -45,9 +46,9 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
 
         it('should handle file upload successfully', async () => {
             const mockBody = { pathname: '/test/path', token: 'upload-token' };
-            const mockResponse = { 
-                type: 'blob.upload-completed' as const, 
-                response: 'ok' as const 
+            const mockResponse = {
+                type: 'blob.upload-completed' as const,
+                response: 'ok' as const
             };
 
             mockRequest.json.mockResolvedValue(mockBody);
@@ -98,13 +99,13 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
         it('should call onBeforeGenerateToken with correct parameters', async () => {
             const mockBody = { pathname: '/test/path' };
             mockRequest.json.mockResolvedValue(mockBody);
-            
+
             let onBeforeGenerateTokenCallback: any;
             mockedHandleUpload.mockImplementation((config) => {
                 onBeforeGenerateTokenCallback = config.onBeforeGenerateToken;
-                return Promise.resolve({ 
-                    type: 'blob.upload-completed' as const, 
-                    response: 'ok' as const 
+                return Promise.resolve({
+                    type: 'blob.upload-completed' as const,
+                    response: 'ok' as const
                 });
             });
 
@@ -112,7 +113,7 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
 
             // Test the callback
             const result = await onBeforeGenerateTokenCallback('test-pathname', 'test-payload', {} as any);
-            
+
             expect(result).toEqual({
                 pathname: '/test-payload',
                 allowedContentTypes: ['video/*', 'image/*'],
@@ -126,13 +127,13 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
         it('should handle onUploadCompleted callback', async () => {
             const mockBody = { pathname: '/test/path' };
             mockRequest.json.mockResolvedValue(mockBody);
-            
+
             let onUploadCompletedCallback: any;
             mockedHandleUpload.mockImplementation((config) => {
                 onUploadCompletedCallback = config.onUploadCompleted;
-                return Promise.resolve({ 
-                    type: 'blob.upload-completed' as const, 
-                    response: 'ok' as const 
+                return Promise.resolve({
+                    type: 'blob.upload-completed' as const,
+                    response: 'ok' as const
                 });
             });
 
@@ -141,26 +142,26 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
             // Test the callback with valid token payload
             const mockBlob = { url: 'test-url' };
             const tokenPayload = JSON.stringify({ trophyId: 'trophy123', fileName: 'test-file' });
-            
+
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-            
+
             await expect(onUploadCompletedCallback({ blob: mockBlob, tokenPayload })).resolves.toBeUndefined();
-            
+
             expect(consoleSpy).toHaveBeenCalledWith('Upload completed for trophy:', 'trophy123', 'file:', 'test-file');
-            
+
             consoleSpy.mockRestore();
         });
 
         it('should handle onUploadCompleted callback with invalid token payload', async () => {
             const mockBody = { pathname: '/test/path' };
             mockRequest.json.mockResolvedValue(mockBody);
-            
+
             let onUploadCompletedCallback: any;
             mockedHandleUpload.mockImplementation((config) => {
                 onUploadCompletedCallback = config.onUploadCompleted;
-                return Promise.resolve({ 
-                    type: 'blob.upload-completed' as const, 
-                    response: 'ok' as const 
+                return Promise.resolve({
+                    type: 'blob.upload-completed' as const,
+                    response: 'ok' as const
                 });
             });
 
@@ -169,26 +170,26 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
             // Test the callback with invalid token payload
             const mockBlob = { url: 'test-url' };
             const tokenPayload = 'invalid-json';
-            
+
             const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-            
+
             await expect(onUploadCompletedCallback({ blob: mockBlob, tokenPayload })).rejects.toThrow('Could not process upload completion');
-            
+
             expect(consoleErrorSpy).toHaveBeenCalledWith('Error processing upload completion:', expect.any(SyntaxError));
-            
+
             consoleErrorSpy.mockRestore();
         });
 
         it('should handle onUploadCompleted callback with no token payload', async () => {
             const mockBody = { pathname: '/test/path' };
             mockRequest.json.mockResolvedValue(mockBody);
-            
+
             let onUploadCompletedCallback: any;
             mockedHandleUpload.mockImplementation((config) => {
                 onUploadCompletedCallback = config.onUploadCompleted;
-                return Promise.resolve({ 
-                    type: 'blob.upload-completed' as const, 
-                    response: 'ok' as const 
+                return Promise.resolve({
+                    type: 'blob.upload-completed' as const,
+                    response: 'ok' as const
                 });
             });
 
@@ -196,7 +197,7 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
 
             // Test the callback with no token payload
             const mockBlob = { url: 'test-url' };
-            
+
             await expect(onUploadCompletedCallback({ blob: mockBlob, tokenPayload: null })).resolves.toBeUndefined();
         });
     });
@@ -306,9 +307,9 @@ describe('/api/trophy/[trophyId]/[fileName]/route', () => {
             const mockParams = Promise.resolve({ trophyId: 'trophy456', fileName: 'another-file' });
             const mockRequest = { json: jest.fn().mockResolvedValue({}) } as any;
 
-            mockedHandleUpload.mockResolvedValue({ 
-                type: 'blob.upload-completed' as const, 
-                response: 'ok' as const 
+            mockedHandleUpload.mockResolvedValue({
+                type: 'blob.upload-completed' as const,
+                response: 'ok' as const
             });
 
             await POST(mockRequest, { params: mockParams });

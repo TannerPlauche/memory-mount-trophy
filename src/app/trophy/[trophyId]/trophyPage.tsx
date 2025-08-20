@@ -97,12 +97,12 @@ export default function TrophyPage() {
                     return;
                 }
                 const fileData = await getFiles(trophyId);
-                if (fileData.error) {
+                if (!fileData) {
                     setFileError(true);
-                    setFileErrorMessage(fileData.error);
+                    setFileErrorMessage('No file uploaded. Please upload a file.');
                 } else if (fileData?.length > 0) {
                     const sortedFiles = sortByLastModified(fileData);
-                    const { videoFiles, imageFiles } = sortFiles(sortedFiles);
+                    const { videoFiles, imageFiles } = sortFiles<iTrophyFile>(sortedFiles);
 
                     setFileError(false);
                     setFileErrorMessage('');
@@ -507,7 +507,7 @@ export default function TrophyPage() {
                         </section>
                     )}
                 </div >
-                                <div className='edits flex flex-col gap-2 items-start mt-4'>
+                <div className='edits flex flex-col gap-2 items-start mt-4'>
                     {!!videoFile && <a
                         className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
                         onClick={() => replaceVideo()}

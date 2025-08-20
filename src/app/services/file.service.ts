@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { del, list, put } from '@vercel/blob';
 import { ReadStream } from 'fs';
 import { iTrophyFile } from '../shared/types/types';
@@ -33,7 +34,7 @@ export async function createFile(trophyId: string, fileName: string, file: ReadS
     return blob;
 }
 
-export const getFiles = async (trophyId: string): Promise<iTrophyFile[] | { error: string }> => {
+export const getFiles = async (trophyId: string): Promise<iTrophyFile[]> => {
     try {
         if (!trophyId) {
             throw new Error('Trophy ID is required');
@@ -43,7 +44,7 @@ export const getFiles = async (trophyId: string): Promise<iTrophyFile[] | { erro
         return response.data;
     } catch (error) {
         console.error('Error fetching files:', error);
-        return { error: 'Failed to fetch files' };
+        return [];
     }
 };
 
@@ -115,28 +116,29 @@ export const emptyBucket = async (files: iTrophyFile[]) => {
     }));
 };
 
-export const getFileType = (file: iTrophyFile | File): string => {
+export const getFileType = <T>(file: T): string => {
     if (!file) {
         return '';
     }
 
     // For File objects from the file system
-    if ('name' in file && file.name) {
-        return file.name.split('.').pop()?.toLowerCase() || '';
+    if (typeof file === 'object' && file !== null && 'name' in file && (file as any).name) {
+        return (file as any).name.split('.').pop()?.toLowerCase() || '';
     }
 
     // For iTrophyFile objects from storage
-    if ('pathname' in file && file.pathname) {
-        return file.pathname.split('.').pop()?.toLowerCase() || '';
+    if (typeof file === 'object' && file !== null && 'pathname' in file && (file as any).pathname) {
+        return (file as any).pathname.split('.').pop()?.toLowerCase() || '';
     }
 
     return '';
 };
 
-export const sortFiles = (files: (File | iTrophyFile)[]): {
-    videoFiles: (File | iTrophyFile)[],
-    imageFiles: (File | iTrophyFile)[],
-    otherFiles: (File | iTrophyFile)[]
+// duplicate this to return 
+export const sortFiles = <T>(files: (T)[]): {
+    videoFiles: T[],
+    imageFiles: T[],
+    otherFiles: T[]
 } => {
     if (!files || files.length === 0) {
         return { videoFiles: [], imageFiles: [], otherFiles: [] };
@@ -164,7 +166,7 @@ export const validateFiles = (files: File[]): { valid: boolean; message?: string
         };
     }
 
-    const { videoFiles, imageFiles, otherFiles } = sortFiles(files);
+    const { videoFiles, imageFiles, otherFiles } = sortFiles<File>(files);
 
     if (videoFiles.length > 1) {
         return {
