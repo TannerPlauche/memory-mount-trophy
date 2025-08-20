@@ -13,10 +13,6 @@ export async function createFile(trophyId: string, fileName: string, file: ReadS
     const files = await listFiles(trophyId);
     console.log('Existing files count:', files.length);
 
-    if (files.length > 0) {
-        await emptyBucket(files as iTrophyFile[]);
-    }
-
     const token = process.env.BLOB_READ_WRITE_TOKEN;
     if (!token) {
         throw new Error('BLOB_READ_WRITE_TOKEN environment variable is not set');
@@ -48,7 +44,7 @@ export const getFiles = async (trophyId: string): Promise<iTrophyFile[]> => {
     }
 };
 
-export const deleteTrophyFile = async (trophyId: string, file: iTrophyFile): Promise<{ success: boolean; error?: string }> => {
+export const deleteFile = async (trophyId: string, file: iTrophyFile): Promise<{ success: boolean; error?: string }> => {
     try {
         if (!trophyId || !file) {
             throw new Error('Trophy ID and file are required');
@@ -95,25 +91,6 @@ export const listFiles = async (folder: string) => {
         console.error("Error listing files:", error);
         return [];
     }
-};
-
-export const emptyBucket = async (files: iTrophyFile[]) => {
-    if (!files || files.length === 0) {
-        return;
-    }
-
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) {
-        throw new Error('BLOB_READ_WRITE_TOKEN environment variable is not set');
-    }
-
-    console.log('Deleting files, count:', files.length);
-
-    await Promise.all(files.map(async (file) => {
-        if (file && file.url) {
-            await del(file.url, { token });
-        }
-    }));
 };
 
 export const getFileType = <T>(file: T): string => {

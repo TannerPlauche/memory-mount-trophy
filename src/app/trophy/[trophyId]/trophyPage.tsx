@@ -8,7 +8,7 @@ import Inline from "yet-another-react-lightbox/plugins/inline";
 import { upload } from '@vercel/blob/client';
 import { iTrophyFile } from '@/app/shared/types/types';
 import { imageFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '@/app/shared/constants/constants';
-import { deleteTrophyFile, getFiles, sortFiles, validateFiles } from '@/app/services/file.service';
+import { deleteFile, getFiles, sortFiles, validateFiles } from '@/app/services/file.service';
 
 import "yet-another-react-lightbox/styles.css";
 import Modal from '@/app/components/Modal';
@@ -260,7 +260,7 @@ export default function TrophyPage() {
         const confirmed = confirm(`Are you sure you want to delete ${file.name}? This action cannot be undone.`);
         if (confirmed) {
             // Call the delete API or function here
-            const success = await deleteTrophyFile(trophyId as string, file);
+            const success = await deleteFile(trophyId as string, file);
             if (success) {
                 const updatedImageFiles = imageFiles.filter((img) => img.downloadUrl !== file.downloadUrl);
                 setImageFiles(updatedImageFiles);

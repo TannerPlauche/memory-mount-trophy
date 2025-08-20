@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 import { useParams } from 'next/navigation'
 import { upload } from '@vercel/blob/client'
 import TrophyPage from './trophyPage'
-import { getFiles, sortFiles, validateFiles, deleteTrophyFile } from '@/app/services/file.service'
+import { getFiles, sortFiles, validateFiles, deleteFile } from '@/app/services/file.service'
 import { iTrophyFile } from '@/app/shared/types/types'
 
 // Mock Next.js navigation
@@ -21,7 +21,7 @@ jest.mock('@/app/services/file.service', () => ({
     getFiles: jest.fn(),
     sortFiles: jest.fn(),
     validateFiles: jest.fn(),
-    deleteTrophyFile: jest.fn(),
+    deleteFile: jest.fn(),
 }))
 
 // Mock constants
@@ -38,7 +38,7 @@ const mockUpload = upload as jest.MockedFunction<typeof upload>
 const mockGetFiles = getFiles as jest.MockedFunction<typeof getFiles>
 const mockSortFiles = sortFiles as jest.MockedFunction<typeof sortFiles>
 const mockValidateFiles = validateFiles as jest.MockedFunction<typeof validateFiles>
-const mockDeleteTrophyFile = deleteTrophyFile as jest.MockedFunction<typeof deleteTrophyFile>
+const mockDeleteFile = deleteFile as jest.MockedFunction<typeof deleteFile>
 
 // Mock data - creating a simplified mock that satisfies the interface
 const createMockTrophyFile = (overrides: Partial<iTrophyFile> = {}): iTrophyFile => {

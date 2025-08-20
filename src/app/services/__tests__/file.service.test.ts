@@ -2,9 +2,7 @@
 import {
     createFile,
     getFiles,
-    deleteTrophyFile,
     listFiles,
-    emptyBucket,
     getFileType,
     sortFiles,
     validateFiles
@@ -36,7 +34,7 @@ describe('file.service', () => {
     describe('createFile', () => {
         it('should create a file successfully', async () => {
             const mockFile = { pipe: jest.fn() } as any;
-            const mockBlob = { 
+            const mockBlob = {
                 url: 'https://test.com/file.mp4',
                 downloadUrl: 'https://test.com/file.mp4',
                 pathname: '/trophy123/test.mp4',
@@ -44,7 +42,7 @@ describe('file.service', () => {
                 contentDisposition: 'inline'
             };
 
-            mockedList.mockResolvedValue({ 
+            mockedList.mockResolvedValue({
                 blobs: [],
                 hasMore: false,
                 cursor: undefined
@@ -79,7 +77,7 @@ describe('file.service', () => {
             delete process.env.BLOB_READ_WRITE_TOKEN;
             const mockFile = { pipe: jest.fn() } as any;
 
-            mockedList.mockResolvedValue({ 
+            mockedList.mockResolvedValue({
                 blobs: [],
                 hasMore: false,
                 cursor: undefined
@@ -90,7 +88,7 @@ describe('file.service', () => {
 
         it('should empty bucket if files exist', async () => {
             const mockFile = { pipe: jest.fn() } as any;
-            const mockBlob = { 
+            const mockBlob = {
                 url: 'https://test.com/file.mp4',
                 downloadUrl: 'https://test.com/file.mp4',
                 pathname: '/trophy123/test.mp4',
@@ -105,7 +103,7 @@ describe('file.service', () => {
                 uploadedAt: new Date()
             }];
 
-            mockedList.mockResolvedValue({ 
+            mockedList.mockResolvedValue({
                 blobs: existingFiles,
                 hasMore: false,
                 cursor: undefined
@@ -148,7 +146,7 @@ describe('file.service', () => {
         });
     });
 
-    describe('deleteTrophyFile', () => {
+    describe('deleteFile', () => {
         it('should delete file successfully', async () => {
             const mockFile: iTrophyFile = {
                 name: 'test.mp4',
@@ -161,7 +159,7 @@ describe('file.service', () => {
 
             mockedAxios.delete.mockResolvedValue({ data: { success: true } });
 
-            const result = await deleteTrophyFile('trophy123', mockFile);
+            const result = await deleteFile('trophy123', mockFile);
 
             expect(mockedAxios.delete).toHaveBeenCalledWith('/api/trophy/trophy123/delete', {
                 params: {
@@ -172,8 +170,8 @@ describe('file.service', () => {
         });
 
         it('should return error when parameters are missing', async () => {
-            const result1 = await deleteTrophyFile('', {} as iTrophyFile);
-            const result2 = await deleteTrophyFile('trophy123', null as any);
+            const result1 = await deleteFile('', {} as iTrophyFile);
+            const result2 = await deleteFile('trophy123', null as any);
 
             expect(result1).toEqual({ success: false, error: 'Failed to delete file' });
             expect(result2).toEqual({ success: false, error: 'Failed to delete file' });
@@ -191,7 +189,7 @@ describe('file.service', () => {
 
             mockedAxios.delete.mockRejectedValue(new Error('API Error'));
 
-            const result = await deleteTrophyFile('trophy123', mockFile);
+            const result = await deleteFile('trophy123', mockFile);
 
             expect(result).toEqual({ success: false, error: 'Failed to delete file' });
         });
@@ -200,14 +198,14 @@ describe('file.service', () => {
     describe('listFiles', () => {
         it('should list files successfully', async () => {
             const mockFiles = [
-                { 
+                {
                     url: 'https://test.com/test1.mp4',
                     downloadUrl: 'https://test.com/test1.mp4',
                     pathname: '/trophy123/test1.mp4',
                     size: 1000,
                     uploadedAt: new Date()
                 },
-                { 
+                {
                     url: 'https://test.com/test2.jpg',
                     downloadUrl: 'https://test.com/test2.jpg',
                     pathname: '/trophy123/test2.jpg',
@@ -215,7 +213,7 @@ describe('file.service', () => {
                     uploadedAt: new Date()
                 }
             ];
-            mockedList.mockResolvedValue({ 
+            mockedList.mockResolvedValue({
                 blobs: mockFiles,
                 hasMore: false,
                 cursor: undefined
@@ -231,7 +229,7 @@ describe('file.service', () => {
         });
 
         it('should return empty array when no files exist', async () => {
-            mockedList.mockResolvedValue({ 
+            mockedList.mockResolvedValue({
                 blobs: [],
                 hasMore: false,
                 cursor: undefined
@@ -254,41 +252,6 @@ describe('file.service', () => {
             const result = await listFiles('trophy123');
 
             expect(result).toEqual([]);
-        });
-    });
-
-    describe('emptyBucket', () => {
-        it('should delete all files in bucket', async () => {
-            const files = [
-                { url: 'https://test.com/file1.mp4' },
-                { url: 'https://test.com/file2.jpg' }
-            ];
-            mockedDel.mockResolvedValue(undefined as any);
-
-            await emptyBucket(files);
-
-            expect(mockedDel).toHaveBeenCalledTimes(2);
-            expect(mockedDel).toHaveBeenCalledWith('https://test.com/file1.mp4', { token: 'test-token' });
-            expect(mockedDel).toHaveBeenCalledWith('https://test.com/file2.jpg', { token: 'test-token' });
-        });
-
-        it('should handle empty file list', async () => {
-            await emptyBucket([]);
-
-            expect(mockedDel).not.toHaveBeenCalled();
-        });
-
-        it('should handle null file list', async () => {
-            await emptyBucket(null as any);
-
-            expect(mockedDel).not.toHaveBeenCalled();
-        });
-
-        it('should throw error when token is missing', async () => {
-            delete process.env.BLOB_READ_WRITE_TOKEN;
-            const files = [{ url: 'https://test.com/file1.mp4' }];
-
-            await expect(emptyBucket(files)).rejects.toThrow('BLOB_READ_WRITE_TOKEN environment variable is not set');
         });
     });
 
