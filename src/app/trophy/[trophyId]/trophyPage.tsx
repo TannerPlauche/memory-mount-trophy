@@ -40,7 +40,7 @@ export default function TrophyPage() {
     const [index, setIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSize, setSelectedSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
-    const [sectionToShow, setSectionToShow] = useState<PageSections>(PageSections.SIGN_UP);
+    const [sectionToShow, setSectionToShow] = useState<PageSections>(PageSections.CHECK_CODE);
     const [userToken, setUserToken] = useState<string | null>(null);
 
     const openModal = (size: 'sm' | 'md' | 'lg' | 'xl') => {
@@ -324,7 +324,7 @@ export default function TrophyPage() {
     // Show code check if not logged in and there are no files
     if (!isLoading && !videoFile && !imageFiles.length && sectionToShow === PageSections.CHECK_CODE) {
         return (
-            <CodeCheck onSuccess={() => setSectionToShow(PageSections.LOGIN)} />
+            <CodeCheck onSuccess={() => setSectionToShow(PageSections.LOGIN)} navigate={() => setSectionToShow(PageSections.LOGIN)} />
         )
     }
 

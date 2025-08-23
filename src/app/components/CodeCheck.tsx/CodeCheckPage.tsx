@@ -5,9 +5,10 @@ import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 interface CodeCheckProps {
     onSuccess: () => void;
+    navigate: () => void;
 }
 
-export default function CodeCheck({ onSuccess }: CodeCheckProps) {
+export default function CodeCheck({ onSuccess, navigate }: CodeCheckProps) {
     const [code, setCode] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -56,9 +57,13 @@ export default function CodeCheck({ onSuccess }: CodeCheckProps) {
                     >
                         {isLoading ? "Signing in..." : "Sign In"}
                     </button>
+                    <div className="mt-5">
+                        Already claimed this Memory Mount? <a onClick={navigate} className="text-blue-500 hover:underline">Log in</a>
+                    </div>
                 </form>
                 {isLoading && <LoadingSpinner isFullScreen={true} message="Signing in..." />}
             </div>
+
         </div>
     );
 }
