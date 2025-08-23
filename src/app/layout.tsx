@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="bg-gray-500 flex items-center justify-center py-4">
+        <div className="bg-gray-500 flex items-center justify-center py-1">
           <Image src={logo} alt="Logo" height={150} />
         </div>
         {children}
