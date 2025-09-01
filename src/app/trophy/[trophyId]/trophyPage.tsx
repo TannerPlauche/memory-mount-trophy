@@ -266,7 +266,15 @@ export default function TrophyPage() {
 
     const showImageUpload = () => {
         if (!userToken) {
-            displayErrorTemp('You must be logged in to upload images.');
+            setVideoFile(null);
+            setImageFiles([])
+            setSectionToShow(PageSections.LOGIN);
+            return;
+        }
+
+        const replacePrompt = confirm('Are you sure you want to replace the video? This will remove the current video.');
+
+        if (!replacePrompt) {
             return;
         }
 
@@ -279,12 +287,14 @@ export default function TrophyPage() {
         setTimeout(() => {
             setFileError(false);
             setFileErrorMessage('');
-        }, 3000);
+        }, 5000);
     };
 
     const replaceVideo = () => {
         if (!userToken) {
-            displayErrorTemp('You must be logged in to replace the video.');
+            setVideoFile(null);
+            setImageFiles([])
+            setSectionToShow(PageSections.LOGIN);
             return;
         }
         const replacePrompt = confirm('Are you sure you want to replace the video? This will remove the current video.');
@@ -307,6 +317,22 @@ export default function TrophyPage() {
             videoInputRef.current.value = '';
         }
     };
+
+    const OpenEditImagesModal = () => {
+        if (!userToken) {
+            setVideoFile(null);
+            setImageFiles([])
+            setSectionToShow(PageSections.LOGIN);
+            return;
+        }
+        const replacePrompt = confirm('Are you sure you want to replace the video? This will remove the current video.');
+
+        if (!replacePrompt) {
+            return;
+        }
+
+        openModal('md')
+    }
 
     const updateIndex = (when: boolean) =>
         ({ index: current }: { index: number }) => {
@@ -551,7 +577,7 @@ export default function TrophyPage() {
 
                 {!!imageFiles.length && <a
                     className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
-                    onClick={() => openModal('md')}
+                    onClick={() => OpenEditImagesModal()}
                 >
                     Edit Images
                 </a>
@@ -559,7 +585,7 @@ export default function TrophyPage() {
 
                 {!!imageFiles.length && <a
                     className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
-                    onClick={showImageUpload}
+                    onClick={(showImageUpload)}
                 >
                     Add Images
                 </a>
