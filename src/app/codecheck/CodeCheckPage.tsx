@@ -2,17 +2,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
+import { parseQueryString, setLocalStorageItem, urlDecode } from "../shared/helpers";
 
-interface CodeCheckProps {
-    onSuccess: () => void;
-    navigate: () => void;
-}
-
-export default function CodeCheck({ onSuccess, navigate }: CodeCheckProps) {
+export default function CodeCheck({  }) {
     const [code, setCode] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { redirect, trophyId } = parseQueryString();
+    console.log('trophyId: ', trophyId);
+    console.log('redirect: ', redirect);
 
     const checkCode = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -22,7 +21,9 @@ export default function CodeCheck({ onSuccess, navigate }: CodeCheckProps) {
         setTimeout(() => {
             setIsLoading(false);
             if (code.toLowerCase() === "abc123") {
-                onSuccess();
+                setLocalStorageItem('codeVerified', true.toString());
+                const redirectPath = urlDecode(redirect)
+                router.push(redirectPath || `/trophy/${trophyId}`);
             } else {
                 setError("Invalid code.");
             }
@@ -58,7 +59,7 @@ export default function CodeCheck({ onSuccess, navigate }: CodeCheckProps) {
                         {isLoading ? "Signing in..." : "Sign In"}
                     </button>
                     <div className="mt-5">
-                        Already claimed this Memory Mount? <a onClick={navigate} className="text-blue-500 hover:underline">Log in</a>
+                        Already claimed this Memory Mount? <a onClick={() => router.push('/login')} className="text-blue-500 hover:underline">Log in</a>
                     </div>
                 </form>
                 {isLoading && <LoadingSpinner isFullScreen={true} message="Signing in..." />}

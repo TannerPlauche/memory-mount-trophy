@@ -1,36 +1,29 @@
 "use client";
-import { useParams } from 'next/navigation';
-import axios from "axios";
-import { useEffect, useState, useRef } from "react";
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
-import Lightbox from "yet-another-react-lightbox";
-import Inline from "yet-another-react-lightbox/plugins/inline";
+import Lightbox from 'yet-another-react-lightbox';
+import Inline from 'yet-another-react-lightbox/plugins/inline';
 import { upload } from '@vercel/blob/client';
 import { iTrophyFile } from '@/app/shared/types/types';
 import { imageFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '@/app/shared/constants/constants';
 import { deleteFile, getFiles, sortFiles, validateFiles } from '@/app/services/file.service';
-
-import "yet-another-react-lightbox/styles.css";
+import 'yet-another-react-lightbox/styles.css';
 import Modal from '@/app/components/Modal/Modal';
-import LoginPage from '@/app/components/login/LoginPage';
-import CodeCheck from '@/app/components/CodeCheck.tsx/CodeCheckPage';
-import SignUpPage from '@/app/components/SignUp/SignUp';
+import { getLocalStorageItem, urlEncode } from '@/app/shared/helpers';
+import Image from 'next/image';
 
 const publicPrefix = process.env.PUBLIC_PREFIX;
 
-enum PageSections {
-    CHECK_CODE = 'checkCode',
-    LOGIN = 'login',
-    FILES = 'files',
-    SIGN_UP = 'signUp'
-}
+
 
 export default function TrophyPage() {
+    const router = useRouter();
     const { trophyId } = useParams();
     const [fileError, setFileError] = useState(false);
     const [imageError, setImageError] = useState(false);
-    const [fileErrorMessage, setFileErrorMessage] = useState<string>('');
-    const [imageErrorMessage, setImageErrorMessage] = useState<string>('');
+    const [fileErrorMessage, setFileErrorMessage] = useState('');
+    const [imageErrorMessage, setImageErrorMessage] = useState('');
     const [videoFile, setVideoFile] = useState<iTrophyFile | null>(null);
     const [imageFiles, setImageFiles] = useState<iTrophyFile[]>([]);
     const [slides, setSlides] = useState<{ src: string; width: number; height: number }[]>([]);
@@ -40,66 +33,56 @@ export default function TrophyPage() {
     const [index, setIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSize, setSelectedSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
-    const [sectionToShow, setSectionToShow] = useState<PageSections>(PageSections.CHECK_CODE);
-    const [userToken, setUserToken] = useState<string | null>(null);
+    const [userToken, setUserToken] = useState('');
+    const [codeVerified, setCodeVerified] = useState('');
 
     const openModal = (size: 'sm' | 'md' | 'lg' | 'xl') => {
         setSelectedSize(size);
         setIsModalOpen(true);
     };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
+    const closeModal = () => setIsModalOpen(false);
     // useRef to hold the file input element
     const videoInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const fileNameRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!!videoFile || !!imageFiles.length) {
-            setSectionToShow(PageSections.FILES);
-        }
-    }, [videoFile, imageFiles]);
+        const token = getLocalStorageItem('userToken');
+        setUserToken(typeof token === 'string' ? token : '');
+        const code = getLocalStorageItem('codeVerified');
+        setCodeVerified(typeof code === 'string' ? code : '');
+    }, []);
 
     useEffect(() => {
         const fetchFiles = async () => {
             try {
-                // const response = await axios.get(`/api/trophy/${trophyId}`);
-                if (typeof trophyId !== 'string') {
+                if (!trophyId || typeof trophyId !== 'string') {
                     setFileError(true);
                     setFileErrorMessage('Invalid trophy ID.');
                     setIsLoading(false);
                     return;
                 }
                 const fileData = await getFiles(trophyId);
-                if (!fileData) {
+                if (!fileData?.length) {
                     setFileError(true);
                     setFileErrorMessage('No file uploaded. Please upload a file.');
-                } else if (fileData?.length > 0) {
+                } else {
                     const sortedFiles = sortByLastModified(fileData);
                     const { videoFiles, imageFiles } = sortFiles<iTrophyFile>(sortedFiles);
-
                     setFileError(false);
                     setFileErrorMessage('');
-
-                    // Set video file if available
                     if (videoFiles.length > 0) {
-                        const videoFileWithUrl = {
+                        setVideoFile({
                             ...videoFiles[0],
-                            publicUrl: publicPrefix + videoFiles[0].Key,
+                            url: publicPrefix + videoFiles[0].Key,
                             name: videoFiles[0].Key,
-                        };
-                        setVideoFile(videoFileWithUrl);
+                        });
                     }
-
-                    // Set image files and slides
                     const processedImageFiles = imageFiles.map((file) => ({
                         ...file,
-                        publicUrl: publicPrefix + file.Key,
+                        url: publicPrefix + file.Key,
                         name: file.Key,
                     }));
-
                     setImageFiles(processedImageFiles);
                     setSlides(imageFiles.map((imageFile) => ({
                         src: imageFile.url,
@@ -108,74 +91,49 @@ export default function TrophyPage() {
                     })));
                 }
             } catch (err) {
-                console.log('Error fetching files:', err);
+                console.error('err: ', err);
                 setFileError(true);
                 setFileErrorMessage('No file uploaded. Please upload a file.');
             } finally {
                 setIsLoading(false);
             }
         };
-
         fetchFiles();
     }, [trophyId]);
 
-    const handleLogin = () => {
-        setUserToken(localStorage.getItem('DUMMY_TOKEN'));
-        setSectionToShow(PageSections.FILES);
-    }
-
-    const handleSignUp = () => {
-        setUserToken(localStorage.getItem('DUMMY_TOKEN'));
-        setSectionToShow(PageSections.FILES);
-    }
-
-    const sortByLastModified = (files: iTrophyFile[]) => {
-        return files.sort((a, b) => {
-            const aDate = new Date(a.uploadedAt);
-            const bDate = new Date(b.uploadedAt);
-            return bDate.getTime() - aDate.getTime(); // Sort descending
-        });
-    };
+    const sortByLastModified = (files: iTrophyFile[]) =>
+        files.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
 
     const checkFileSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const input = e.target;
-        if (input.files && input.files.length > 0) {
-            const file = input.files[0];
-            if (file.size > MAX_VIDEO_FILE_SIZE) {
-                setFileError(true);
-                setFileErrorMessage('Please upload a smaller file. Videos must be smaller than 1GB');
-                input.value = ''; // Clear the input
-            } else {
-                setFileError(false);
-                setFileErrorMessage('');
-            }
+        const file = e.target.files?.[0];
+        if (file && file.size > MAX_VIDEO_FILE_SIZE) {
+            setFileError(true);
+            setFileErrorMessage('Please upload a smaller file. Videos must be smaller than 1GB');
+            e.target.value = '';
+        } else {
+            setFileError(false);
+            setFileErrorMessage('');
         }
     };
 
     const checkImagesFileSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const input = e.target;
-        if (input.files && input.files.length > 0) {
-            const imageFiles = Array.from(input.files);
-            const largeImages = imageFiles.filter((file) => file.size > MAX_IMAGE_FILE_SIZE);
-
-            if (largeImages.length > 0) {
-                setImageError(true);
-                setImageErrorMessage('Image files must be smaller than 10MB.');
-                input.value = ''; // Clear the input
-            } else {
-                setImageError(false);
-                setImageErrorMessage('');
-            }
-
+        const imageFiles = Array.from(e.target.files || []);
+        const largeImages = imageFiles.filter((file) => file.size > MAX_IMAGE_FILE_SIZE);
+        if (largeImages.length > 0) {
+            setImageError(true);
+            setImageErrorMessage('Image files must be smaller than 10MB.');
+            e.target.value = '';
+        } else {
+            setImageError(false);
+            setImageErrorMessage('');
         }
     };
 
     const uploadFiles = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        setIsUploading(true)
+        setIsUploading(true);
         const fileName = fileNameRef.current?.value || '';
-        const safeFileName = fileName.replace(/[\\/\s-]/g, "_");
-
+        const safeFileName = fileName.replace(/[\\/\s-]/g, '_');
         if (!videoFile) {
             if (!fileName) {
                 setFileError(true);
@@ -183,47 +141,39 @@ export default function TrophyPage() {
                 setIsUploading(false);
                 return;
             }
-
             if (!videoInputRef.current) {
                 setFileError(true);
                 setFileErrorMessage('File input is not available.');
                 setIsUploading(false);
                 return;
             }
-
             if (!videoInputRef.current?.files) {
                 throw new Error('No file selected');
             }
         }
-
-        // I am allowing a user to upload a video and images separately, but a video is required. So there may not be a a video selected
-        // because it has already been uploaded. So, account for the video file/input being empty.
-        const selectedVideoFile = videoInputRef.current && videoInputRef.current.files ? videoInputRef.current.files[0] : undefined;
-        const selectedImageFiles = Array.from(imageInputRef?.current?.files || []);
+        const selectedVideoFile = videoInputRef.current?.files?.[0];
+        const selectedImageFiles = Array.from(imageInputRef.current?.files || []);
         const filesToValidate = [selectedVideoFile, ...selectedImageFiles].filter((f): f is File => !!f);
         const { valid, message } = validateFiles(filesToValidate);
-
         if (!valid) {
             setFileError(true);
             setFileErrorMessage(message || 'Invalid file type or size.');
             setIsUploading(false);
             return;
         }
-
         try {
             if (selectedVideoFile) {
-                const videoFileType = selectedVideoFile.name.split('.').pop() || 'mp4'; // Default to mp4 if no extension
+                const videoFileType = selectedVideoFile.name.split('.').pop() || 'mp4';
                 const renamedFile = new File([selectedVideoFile], `${safeFileName}.${videoFileType}`, { type: videoFileType });
                 await upload(`/${trophyId}/${renamedFile.name}`, renamedFile, {
                     access: 'public',
                     handleUploadUrl: `/api/trophy/${trophyId}/${safeFileName}`,
                 });
             }
-
-            if (selectedImageFiles) {
+            if (selectedImageFiles.length) {
                 await Promise.all(selectedImageFiles.map(async (imageFile) => {
-                    const imageFileType = imageFile.name.split('.').pop() || 'jpg'; // Default to jpg if no extension
-                    const safeImageName = imageFile.name.replace(/[\\/\s-]/g, "_");
+                    const imageFileType = imageFile.name.split('.').pop() || 'jpg';
+                    const safeImageName = imageFile.name.replace(/[\\/\s-]/g, '_');
                     const renamedImageFile = new File([imageFile], `${safeImageName}`, { type: imageFileType });
                     return await upload(`/${trophyId}/${renamedImageFile.name}`, renamedImageFile, {
                         access: 'public',
@@ -231,26 +181,22 @@ export default function TrophyPage() {
                     });
                 }));
             }
-
             setIsUploading(false);
-            window.location.reload(); // Reload the page to fetch the new file
-        } catch (error) {
-            console.error('Error uploading file:', error);
+            window.location.reload();
+        } catch (err) {
+            console.error('err: ', err);
             setFileError(true);
             setFileErrorMessage('Error uploading file. Please try again.');
             setIsUploading(false);
         }
-    }
+    };
 
     const deleteImage = async (file: iTrophyFile) => {
         if (!userToken) {
-            displayErrorTemp('You must be logged in to delete images.');
+            router.push(`/login?redirect=${urlEncode(window.location.pathname)}`);
             return;
         }
-
-        const confirmed = confirm(`Are you sure you want to delete ${file.name}? This action cannot be undone.`);
-        if (confirmed) {
-            // Call the delete API or function here
+        if (confirm(`Are you sure you want to delete ${file.name}? This action cannot be undone.`)) {
             const success = await deleteFile(trophyId as string, file);
             if (success) {
                 const updatedImageFiles = imageFiles.filter((img) => img.downloadUrl !== file.downloadUrl);
@@ -267,107 +213,46 @@ export default function TrophyPage() {
     const showImageUpload = () => {
         if (!userToken) {
             setVideoFile(null);
-            setImageFiles([])
-            setSectionToShow(PageSections.LOGIN);
+            setImageFiles([]);
             return;
         }
-
-        const replacePrompt = confirm('Are you sure you want to replace the video? This will remove the current video.');
-
-        if (!replacePrompt) {
-            return;
+        if (confirm('Are you sure you want to replace the video? This will remove the current video.')) {
+            setImageFiles([]);
         }
-
-        setImageFiles([]);
     };
 
-    const displayErrorTemp = (message: string) => {
-        setFileErrorMessage(message);
-        setFileError(true);
-        setTimeout(() => {
-            setFileError(false);
-            setFileErrorMessage('');
-        }, 5000);
-    };
+    // Removed unused displayErrorTemp
 
     const replaceVideo = () => {
         if (!userToken) {
-            setVideoFile(null);
-            setImageFiles([])
-            setSectionToShow(PageSections.LOGIN);
+            router.push(`/login?redirect=${urlEncode(window.location.pathname)}`);
             return;
         }
-        const replacePrompt = confirm('Are you sure you want to replace the video? This will remove the current video.');
-
-        if (!replacePrompt) {
-            return;
-        }
-
-        // Reset video state
+        if (!confirm('Are you sure you want to replace the video? This will remove the current video.')) return;
         setVideoFile(null);
         setFileError(false);
         setFileErrorMessage('');
-
-        // Clear form inputs
-        if (fileNameRef.current) {
-            fileNameRef.current.value = '';
-        }
-
-        if (videoInputRef.current) {
-            videoInputRef.current.value = '';
-        }
+        if (fileNameRef.current) fileNameRef.current.value = '';
+        if (videoInputRef.current) videoInputRef.current.value = '';
     };
 
-    const OpenEditImagesModal = () => {
-        if (!userToken) {
-            setVideoFile(null);
-            setImageFiles([])
-            setSectionToShow(PageSections.LOGIN);
-            return;
-        }
-        const replacePrompt = confirm('Are you sure you want to replace the video? This will remove the current video.');
-
-        if (!replacePrompt) {
-            return;
-        }
-
-        openModal('md')
-    }
+    // Removed unused openEditImagesModal
 
     const updateIndex = (when: boolean) =>
         ({ index: current }: { index: number }) => {
-            if (when === lightboxIsOpen) {
-                setIndex(current);
-            }
+            if (when === lightboxIsOpen) setIndex(current);
         };
 
-    const toggleOpen = (open: boolean) => {
-        setLightboxIsOpen(open);
-    };
+    const toggleOpen = setLightboxIsOpen;
 
-    // RETURN VIEWS BELOW
-
-    // Show code check if not logged in and there are no files
-    if (!isLoading && !videoFile && !imageFiles.length && sectionToShow === PageSections.CHECK_CODE) {
-        return (
-            <CodeCheck onSuccess={() => setSectionToShow(PageSections.LOGIN)} navigate={() => setSectionToShow(PageSections.LOGIN)} />
-        )
+    // Redirects
+    if (!isLoading && !videoFile && !imageFiles.length) {
+        const currentRoute = urlEncode(window.location.pathname);
+        if (!codeVerified) return router.push(`/codecheck?redirect=${currentRoute}&trophyId=${trophyId}`);
+        if (!userToken) return router.push(`/login?redirect=${currentRoute}`);
     }
 
-    // show login if there are no files and showLogin is true
-    if (!isLoading && !videoFile && !imageFiles.length && sectionToShow === PageSections.LOGIN) {
-        return (
-            <LoginPage onSuccess={handleLogin} navigate={() => setSectionToShow(PageSections.SIGN_UP)} />
-        )
-    }
-
-    if (!isLoading && !videoFile && !imageFiles.length && sectionToShow === PageSections.SIGN_UP) {
-        return (
-            <SignUpPage onSuccess={handleSignUp} navigate={() => setSectionToShow(PageSections.LOGIN)} />
-        )
-    }
-
-    return !isLoading && sectionToShow === PageSections.FILES ? (
+    return !isLoading ? (
         <div className="min-h-screen bg-gray-900 py-10 px-4 md:px-10 text-gray-100">
             <div className="max-w-3xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6 space-y-6">
                 <header className="border-b border-gray-700 pb-4">
@@ -533,7 +418,7 @@ export default function TrophyPage() {
                                         <div key={imageFile.name} className="flex flex-col space-y-2">
                                             <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
                                             <div className="relative inline-block w-32 h-32">
-                                                <img src={imageFile.url} alt={imageFile.name} className="w-32 h-32 object-cover rounded" />
+                                                <Image src={imageFile.url} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
                                                 <button
                                                     onClick={() => deleteImage(imageFile)}
                                                     className="delete-image absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 transition-colors"
@@ -577,7 +462,7 @@ export default function TrophyPage() {
 
                 {!!imageFiles.length && <a
                     className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
-                    onClick={() => OpenEditImagesModal()}
+                    onClick={() => openModal('md')}
                 >
                     Edit Images
                 </a>

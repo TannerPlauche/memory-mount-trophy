@@ -1,18 +1,21 @@
 "use client";
 import { useState } from "react";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
+import { useRouter } from "next/navigation";
+import { parseQueryString, urlDecode } from "../shared/helpers";
 
-interface SignUpPageProps {
-    onSuccess: () => void;
-    navigate: () => void;
-}
 
-export default function SignUpPage({ onSuccess, navigate }: SignUpPageProps) {
+export default function SignUpPage({ }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const router = useRouter();
+    const { redirect, trophyId } = parseQueryString();
+    console.log('trophyId: ', trophyId);
+    console.log('redirect: ', redirect);
 
     const handleSignUp = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
@@ -30,7 +33,8 @@ export default function SignUpPage({ onSuccess, navigate }: SignUpPageProps) {
             // mock registration success
             // Always succeed for demo purposes
             if (true) {
-                onSuccess();
+                const redirectUrl = urlDecode(redirect);
+                router.push(redirectUrl);
             } else {
                 setError("Invalid email or password.");
             }
@@ -88,7 +92,7 @@ export default function SignUpPage({ onSuccess, navigate }: SignUpPageProps) {
                     </button>
                 </form>
                 <div>
-                    <p>Already have an account? <a onClick={navigate} className="text-blue-500 hover:underline">Sign in</a></p>
+                    <p>Already have an account? <a onClick={() => router.push(`/login?redirect=${redirect}&trophyId=${trophyId}`)} className="text-blue-500 hover:underline">Sign in</a></p>
                 </div>
                 {isLoading && <LoadingSpinner isFullScreen={true} message="Signing in..." />}
             </div>

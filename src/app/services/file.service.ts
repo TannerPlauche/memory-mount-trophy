@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { del, list, put } from '@vercel/blob';
+import { list, put } from '@vercel/blob';
 import { ReadStream } from 'fs';
 import { iTrophyFile } from '../shared/types/types';
 import { imageFileTypes, videoFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '../shared/constants/constants';
@@ -57,7 +57,7 @@ export const deleteFile = async (trophyId: string, file: iTrophyFile): Promise<{
         console.log('Deleting file:', file.name);
         const encodedUrl = encodeURIComponent(file.downloadUrl);
 
-        const response = await axios.delete(`/api/trophy/${trophyId}/delete`, {
+         await axios.delete(`/api/trophy/${trophyId}/delete`, {
             params: {
                 downloadUrl: encodedUrl
             }
@@ -71,12 +71,14 @@ export const deleteFile = async (trophyId: string, file: iTrophyFile): Promise<{
 };
 
 export const listFiles = async (folder: string) => {
+    console.log('folder: ', folder);
     try {
         if (!folder) {
             throw new Error('Folder name is required');
         }
 
         const token = process.env.BLOB_READ_WRITE_TOKEN;
+        console.log('get file token: ', token);
         if (!token) {
             throw new Error('BLOB_READ_WRITE_TOKEN environment variable is not set');
         }
