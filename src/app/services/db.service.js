@@ -1,10 +1,10 @@
 // lib/mongodb.js
 import mongoose from 'mongoose';
 
-declare global {
-  // eslint-disable-next-line no-var
-  var mongoose: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } | undefined;
-}
+// declare global {
+//   // eslint-disable-next-line no-var
+//   var mongoose: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } | undefined;
+// }
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -26,13 +26,13 @@ async function dbConnect() {
     return cached.conn;
   }
 
-  if (!cached!.promise) {
-    cached!.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
       return mongoose;
     });
   }
-  cached!.conn = await cached!.promise;
-  return cached!.conn;
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
 
 export default dbConnect;

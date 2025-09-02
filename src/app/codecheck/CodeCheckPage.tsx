@@ -51,7 +51,7 @@ export default function CodeCheck({ }) {
                 } else {
                     setError("Invalid code.");
                 }
-            }, 1200);
+            });
     };
 
     return (
