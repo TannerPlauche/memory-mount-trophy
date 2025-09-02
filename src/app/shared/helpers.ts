@@ -31,6 +31,7 @@ export const getLocalStorageItem = (key: string) => {
     if (!window || !window.localStorage) return null;
 
     const data = localStorage.getItem(key);
+    console.log('data: ', data);
 
     if (data && ['true', 'false'].includes(data)) {
         return data === 'true';

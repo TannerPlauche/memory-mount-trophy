@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
-import { parseQueryString, setLocalStorageItem, urlDecode } from "../shared/helpers";
+import { getLocalStorageItem, parseQueryString, setLocalStorageItem, urlDecode } from "../shared/helpers";
+import axios from "axios";
 
 export default function CodeCheck({ }) {
     const [code, setCode] = useState("");
@@ -10,30 +11,47 @@ export default function CodeCheck({ }) {
     const [trophyId, setTrophyId] = useState("");
     const [redirect, setRedirect] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [userToken, setUserToken] = useState("");
     const router = useRouter();
 
-    // use useEffect to set redirect and trophyId
     useEffect(() => {
         const { redirect, trophyId } = parseQueryString();
+        const token = getLocalStorageItem('userToken');
         setRedirect(urlDecode(redirect));
         setTrophyId(trophyId);
+        setUserToken(typeof token === 'string' ? token : '');
     }, []);
 
     const checkCode = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
-        // Simulate Code Check API call
-        setTimeout(() => {
-            setIsLoading(false);
-            if (code.toLowerCase() === "abc123") {
-                setLocalStorageItem('codeVerified', true.toString());
-                const redirectPath = urlDecode(redirect)
-                router.push(redirectPath || `/trophy/${trophyId}`);
-            } else {
-                setError("Invalid code.");
-            }
-        }, 1200);
+
+        axios.post('/api/memory-mount/claim', {
+            memoryId: trophyId,
+            code,
+            token: userToken
+        })
+            .then(response => {
+                setIsLoading(false);
+                if (response.status === 200) {
+                    setLocalStorageItem('codeVerified', true.toString());
+                    const redirectPath = urlDecode(redirect)
+                    router.push(redirectPath || `/trophy/${trophyId}`);
+                } else {
+                    setError(response.data.message);
+                }
+            })
+            .catch(error => {
+                setIsLoading(false);
+                if (code.toLowerCase() === "abc123") {
+                    setLocalStorageItem('codeVerified', true.toString());
+                    const redirectPath = urlDecode(redirect)
+                    router.push(redirectPath || `/trophy/${trophyId}`);
+                } else {
+                    setError("Invalid code.");
+                }
+            }, 1200);
     };
 
     return (
@@ -62,10 +80,10 @@ export default function CodeCheck({ }) {
                         className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors font-semibold"
                         disabled={isLoading}
                     >
-                        {isLoading ? "Signing in..." : "Sign In"}
+                        {isLoading ? "claiming code..." : "Claim Code"}
                     </button>
                     <div className="mt-5">
-                        Already claimed this Memory Mount? <a onClick={() => router.push('/login')} className="text-blue-500 hover:underline">Log in</a>
+                        Already claimed this Memory Mount? <a onClick={() => router.push(`/login?redirect=${encodeURIComponent(redirect)}&trophyId=${encodeURIComponent(trophyId)}`)} className="text-blue-500 hover:underline">Log in</a>
                     </div>
                 </form>
                 {isLoading && <LoadingSpinner isFullScreen={true} message="Signing in..." />}

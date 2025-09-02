@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import { parseQueryString, urlDecode } from "../shared/helpers";
+import axios from "axios";
 
 
 export default function SignUpPage({ }) {
@@ -13,7 +14,7 @@ export default function SignUpPage({ }) {
     const [isLoading, setIsLoading] = useState(false);
     const [trophyId, setTrophyId] = useState("");
     const [redirect, setRedirect] = useState("");
-    
+
     const router = useRouter();
 
     // use useEffect to set redirect and trophyId
@@ -34,18 +35,24 @@ export default function SignUpPage({ }) {
         setIsLoading(true);
         setError("");
         // Simulate SignUp API call
-        setTimeout(() => {
+
+        axios.post('/api/auth/signup', {
+            email,
+            password,
+        }).then((response) => {
             setIsLoading(false);
-            // mock registration success
-            // Always succeed for demo purposes
-            if (true) {
-                const redirectUrl = urlDecode(redirect);
-                router.push(redirectUrl);
-            } else {
-                setError("Invalid email or password.");
+            const { data } = response;
+            if (data && data?.user?.token) {
+                // Store token in local storage or context
+                localStorage.setItem("token", data.user.token);
+                router.push(redirect);
             }
-        }, 1200);
+        }).catch((error) => {
+            setIsLoading(false);
+            setError("Registration failed.");
+        });
     };
+
 
     return (
         <div className="min-h-screen bg-gray-900 flex items-start justify-center py-10 px-4 md:px-10 text-gray-100">

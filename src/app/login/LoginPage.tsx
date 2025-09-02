@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import { parseQueryString, setLocalStorageItem, urlDecode } from "../shared/helpers";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function LoginPage({ }) {
     const [email, setEmail] = useState("");
@@ -24,17 +25,21 @@ export default function LoginPage({ }) {
         e.preventDefault();
         setIsLoading(true);
         setError("");
-        // Simulate login API call
-        setTimeout(() => {
-            setIsLoading(false);
-            if (email.toLowerCase() === "demo@trophy.com" && password.toLowerCase() === "password") {
-                setLocalStorageItem('userToken', 'USER_TOKEN');
+
+        //post login
+        axios.post('/api/auth/login', { email, password })
+            .then(response => {
+                setLocalStorageItem('userToken', response?.data?.user?.token);
                 const redirectUrl = urlDecode(redirect);
                 router.push(redirectUrl || `/trophy/${trophyId}`);
-            } else {
+            })
+            .catch(error => {
+                console.log('error: ', error);
                 setError("Invalid email or password.");
-            }
-        }, 1200);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     };
 
     return (

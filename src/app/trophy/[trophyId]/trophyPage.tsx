@@ -12,6 +12,7 @@ import 'yet-another-react-lightbox/styles.css';
 import Modal from '@/app/components/Modal/Modal';
 import { getLocalStorageItem, urlEncode } from '@/app/shared/helpers';
 import Image from 'next/image';
+import { Menu } from '@geist-ui/icons';
 
 const publicPrefix = process.env.PUBLIC_PREFIX;
 
@@ -34,7 +35,7 @@ export default function TrophyPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSize, setSelectedSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
     const [userToken, setUserToken] = useState('');
-    const [codeVerified, setCodeVerified] = useState('');
+    const [codeVerified, setCodeVerified] = useState<string | boolean>('');
 
     const openModal = (size: 'sm' | 'md' | 'lg' | 'xl') => {
         setSelectedSize(size);
@@ -50,7 +51,7 @@ export default function TrophyPage() {
         const token = getLocalStorageItem('userToken');
         setUserToken(typeof token === 'string' ? token : '');
         const code = getLocalStorageItem('codeVerified');
-        setCodeVerified(typeof code === 'string' ? code : '');
+        setCodeVerified(typeof code === 'boolean' ? code : '');
     }, []);
 
     useEffect(() => {
@@ -237,6 +238,14 @@ export default function TrophyPage() {
     };
 
     // Removed unused openEditImagesModal
+    const openEditImagesModal = () => {
+        if (!userToken) {
+            router.push(`/login?redirect=${urlEncode(window.location.pathname)}`);
+            return;
+        }
+
+        openModal('md')
+    }
 
     const updateIndex = (when: boolean) =>
         ({ index: current }: { index: number }) => {
@@ -248,18 +257,22 @@ export default function TrophyPage() {
     // Redirects
     if (!isLoading && !videoFile && !imageFiles.length) {
         const currentRoute = urlEncode(window.location.pathname);
-        if (!codeVerified) return router.push(`/codecheck?redirect=${currentRoute}&trophyId=${trophyId}`);
+        if (userToken && !codeVerified) return router.push(`/codecheck?redirect=${currentRoute}&trophyId=${trophyId}`);
         if (!userToken) return router.push(`/login?redirect=${currentRoute}`);
     }
 
     return !isLoading ? (
         <div className="min-h-screen bg-gray-900 py-10 px-4 md:px-10 text-gray-100">
             <div className="max-w-3xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6 space-y-6">
-                <header className="border-b border-gray-700 pb-4">
+                <header className="border-b border-gray-700 pb-4 flex justify-between">
                     <p className="text-gray-400 text-sm mt-1">
                         Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
                     </p>
 
+                    <Menu onClick={() => { console.log('click') }} />
+                    <button type="button" className="btn btn-primary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." title="">
+                        Popover on right
+                    </button>
                 </header>
 
                 {fileError && (
@@ -462,7 +475,7 @@ export default function TrophyPage() {
 
                 {!!imageFiles.length && <a
                     className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
-                    onClick={() => openModal('md')}
+                    onClick={openEditImagesModal}
                 >
                     Edit Images
                 </a>
