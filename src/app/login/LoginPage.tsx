@@ -1,16 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import { parseQueryString, setLocalStorageItem, urlDecode } from "../shared/helpers";
 import { useRouter } from "next/navigation";
 
-export default function LoginPage({  }) {
+export default function LoginPage({ }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [trophyId, setTrophyId] = useState("");
+    const [redirect, setRedirect] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-    const { redirect, trophyId } = parseQueryString();
+
+    // use useEffect to set redirect and trophyId
+    useEffect(() => {
+        const { redirect, trophyId } = parseQueryString();
+        setRedirect(urlDecode(redirect));
+        setTrophyId(trophyId);
+    }, []);
 
     const handleLogin = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();

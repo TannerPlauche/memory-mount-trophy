@@ -3,6 +3,9 @@ export const urlEncode = (url: string) => encodeURIComponent(url);
 export const urlDecode = (url: string) => decodeURIComponent(url);
 
 export const parseQueryString = () => {
+    if (!window) {
+        return {};
+    }
 
     const str = window.location.search;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,10 +22,14 @@ export const parseQueryString = () => {
 };
 
 export const setLocalStorageItem = (key: string, data: string) => {
+    if (!window || !window.localStorage) return;
+
     localStorage.setItem(key, data);
 }
 
 export const getLocalStorageItem = (key: string) => {
+    if (!window || !window.localStorage) return null;
+
     const data = localStorage.getItem(key);
 
     if (data && ['true', 'false'].includes(data)) {

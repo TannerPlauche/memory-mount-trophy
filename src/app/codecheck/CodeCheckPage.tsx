@@ -1,17 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import { parseQueryString, setLocalStorageItem, urlDecode } from "../shared/helpers";
 
-export default function CodeCheck({  }) {
+export default function CodeCheck({ }) {
     const [code, setCode] = useState("");
     const [error, setError] = useState("");
+    const [trophyId, setTrophyId] = useState("");
+    const [redirect, setRedirect] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-    const { redirect, trophyId } = parseQueryString();
-    console.log('trophyId: ', trophyId);
-    console.log('redirect: ', redirect);
+
+    // use useEffect to set redirect and trophyId
+    useEffect(() => {
+        const { redirect, trophyId } = parseQueryString();
+        setRedirect(urlDecode(redirect));
+        setTrophyId(trophyId);
+    }, []);
 
     const checkCode = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

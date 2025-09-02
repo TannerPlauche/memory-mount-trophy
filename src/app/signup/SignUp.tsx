@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import { parseQueryString, urlDecode } from "../shared/helpers";
@@ -11,11 +11,17 @@ export default function SignUpPage({ }) {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-
+    const [trophyId, setTrophyId] = useState("");
+    const [redirect, setRedirect] = useState("");
+    
     const router = useRouter();
-    const { redirect, trophyId } = parseQueryString();
-    console.log('trophyId: ', trophyId);
-    console.log('redirect: ', redirect);
+
+    // use useEffect to set redirect and trophyId
+    useEffect(() => {
+        const { redirect, trophyId } = parseQueryString();
+        setRedirect(urlDecode(redirect));
+        setTrophyId(trophyId);
+    }, []);
 
     const handleSignUp = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
