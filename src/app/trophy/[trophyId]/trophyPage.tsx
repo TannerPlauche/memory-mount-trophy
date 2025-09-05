@@ -10,12 +10,14 @@ import { imageFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '@/app/
 import { deleteFile, getFiles, sortFiles, validateFiles } from '@/app/services/file.service';
 import 'yet-another-react-lightbox/styles.css';
 import Modal from '@/app/components/Modal/Modal';
-import { getLocalStorageItem, urlEncode } from '@/app/shared/helpers';
+import { getLocalStorageItem, getVerifiedCode, urlEncode } from '@/app/shared/helpers';
 import Image from 'next/image';
-import { Menu } from '@geist-ui/icons';
+import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
+import { MenuAlt } from 'geist-icons';
+import '@szhsin/react-menu/dist/index.css';
+import '@szhsin/react-menu/dist/transitions/zoom.css';
 
 const publicPrefix = process.env.PUBLIC_PREFIX;
-
 
 
 export default function TrophyPage() {
@@ -50,8 +52,10 @@ export default function TrophyPage() {
     useEffect(() => {
         const token = getLocalStorageItem('userToken');
         setUserToken(typeof token === 'string' ? token : '');
-        const code = getLocalStorageItem('codeVerified');
-        setCodeVerified(typeof code === 'boolean' ? code : '');
+        const code = getVerifiedCode(trophyId as string);
+        if (code) {
+            setCodeVerified(code);
+        }
     }, []);
 
     useEffect(() => {
@@ -73,16 +77,17 @@ export default function TrophyPage() {
                     setFileError(false);
                     setFileErrorMessage('');
                     if (videoFiles.length > 0) {
+                        console.log(`Video file found: ${videoFiles[0].url}`);
                         setVideoFile({
                             ...videoFiles[0],
-                            url: publicPrefix + videoFiles[0].Key,
-                            name: videoFiles[0].Key,
+                            url: videoFiles[0].url,
+                            name: videoFiles[0].url,
                         });
                     }
                     const processedImageFiles = imageFiles.map((file) => ({
                         ...file,
-                        url: publicPrefix + file.Key,
-                        name: file.Key,
+                        url: file.url,
+                        name: file.url,
                     }));
                     setImageFiles(processedImageFiles);
                     setSlides(imageFiles.map((imageFile) => ({
@@ -269,235 +274,251 @@ export default function TrophyPage() {
                         Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
                     </p>
 
-                    <Menu onClick={() => { console.log('click') }} />
-                    <button type="button" className="btn btn-primary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right" data-bs-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." title="">
-                        Popover on right
-                    </button>
+                    {(!!videoFile || !!imageFiles.length) && <Menu menuButton={
+                        <MenuButton className="bg-gray-700 text-gray-100 px-4 py-2 rounded-md"><MenuAlt /></MenuButton>
+                    }>
+                        {!!videoFile &&
+                            <MenuItem className="w-fit">
+                                <a
+                                    className="inline-block hover:underline text-sm cursor-pointer"
+                                    onClick={() => replaceVideo()}
+                                >
+                                    Replace Video
+                                </a>
+                            </MenuItem>}
+
+                        {!!imageFiles.length &&
+                            <MenuItem className="w-fit">
+                                <a
+                                    className="inline-block  hover:underline text-sm cursor-pointer"
+                                    onClick={openEditImagesModal}
+                                >
+                                    Edit Images
+                                </a>
+                            </MenuItem>
+                        }
+                        {!!imageFiles.length &&
+                            <MenuItem className="w-fit">
+                                <a
+                                    className="inline-block  hover:underline text-sm cursor-pointer"
+                                    onClick={(showImageUpload)}
+                                >
+                                    Add Images
+                                </a>
+                            </MenuItem>
+                        }
+                    </Menu>
+                    }
+
+                    {/* </div> */}
+
+
+
                 </header>
 
-                {fileError && (
-                    <div className="text-red-400 text-sm">{fileErrorMessage}</div>
-                )}
+                {
+                    fileError && (
+                        <div className="text-red-400 text-sm">{fileErrorMessage}</div>
+                    )
+                }
 
-                {!videoFile ? (
-                    <section>
-                        <h2 className="text-xl font-semibold text-white mb-4">
-                            Select a Trophy Video
-                        </h2>
-                        {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
-                        <form className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">
-                                    Trophy Name
-                                </label>
-                                <input
-                                    id="fileName"
-                                    ref={fileNameRef}
-                                    type="text"
-                                    name="fileName"
-                                    placeholder="e.g., Elk Hunt 2024"
-                                    className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">
-                                    Upload Video
-                                </label>
-                                <input
-                                    id="videoInput"
-                                    ref={videoInputRef}
-                                    type="file"
-                                    name="file"
-                                    accept="video/*"
-                                    onChange={checkFileSize}
-                                    className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
-                                />
-                            </div>
-                        </form>
-                        {(!videoFile && imageFiles.length) && (
-                            <button
-                                type="button"
-                                onClick={uploadFiles}
-                                className="my-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                            >
-                                Submit
-                            </button>
-                        )}
-                    </section>
-                ) : (
-                    <section>
-                        <h2 className="text-xl font-semibold text-white mb-4">
-                            Trophy Video
-                        </h2>
-                        <ul className="mb-4 space-y-2">
-                            <li>
-                                <a
-                                    href={videoFile.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-400 hover:underline break-all text-sm"
+                {
+                    !videoFile ? (
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">
+                                Select a Trophy Video
+                            </h2>
+                            {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
+                            <form className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Trophy Name
+                                    </label>
+                                    <input
+                                        id="fileName"
+                                        ref={fileNameRef}
+                                        type="text"
+                                        name="fileName"
+                                        placeholder="e.g., Elk Hunt 2024"
+                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Upload Video
+                                    </label>
+                                    <input
+                                        id="videoInput"
+                                        ref={videoInputRef}
+                                        type="file"
+                                        name="file"
+                                        accept="video/*"
+                                        onChange={checkFileSize}
+                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
+                                    />
+                                </div>
+                            </form>
+                            {(!videoFile && !!imageFiles.length) && (
+                                <button
+                                    type="button"
+                                    onClick={uploadFiles}
+                                    className="my-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                 >
-                                    {videoFile.name}
-                                </a>
-                            </li>
-                        </ul>
-                        <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
-                            <video
-                                src={videoFile.url}
-                                controls
-                                className="w-full max-h-[500px] bg-black"
-                            >
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                    </section>
-                )}
-
-                {!imageFiles.length ? (
-                    <section>
-                        <h2 className="text-xl font-semibold text-white mb-4">
-                            Select Trophy Images
-                        </h2>
-                        {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
-                        <form className="space-y-4">
-                            {imageError && (
-                                <div className="text-red-400 text-sm">{imageErrorMessage}</div>
+                                    Submit
+                                </button>
                             )}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">
-                                    Upload Images
-                                </label>
-                                <input
-                                    id="imageInput"
-                                    ref={imageInputRef}
-                                    type="file"
-                                    name="file"
-                                    accept={imageFileTypes.join(',')}
-                                    multiple
-                                    onChange={checkImagesFileSize}
-                                    className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
-                                />
+                        </section>
+                    ) : (
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">
+                                Trophy Video
+                            </h2>
+                            <ul className="mb-4 space-y-2">
+                                <li>
+                                    <a
+                                        href={videoFile.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className=" hover:underline break-all text-sm"
+                                    >
+                                        {videoFile.name}
+                                    </a>
+                                </li>
+                            </ul>
+                            <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
+                                <video
+                                    src={videoFile.url}
+                                    controls
+                                    className="w-full max-h-[500px] bg-black"
+                                >
+                                    Your browser does not support the video tag.
+                                </video>
                             </div>
-                            <button
-                                type="button"
-                                onClick={uploadFiles}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                            >
-                                Submit
-                            </button>
-                        </form>
-                    </section>
-                ) : (
-                    <section>
-                        <h2 className="text-xl font-semibold text-white mb-4">
-                            Trophy Images
-                        </h2>
-                        <Lightbox
-                            open={lightboxIsOpen}
-                            close={() => toggleOpen(false)}
-                            index={index}
-                            plugins={[Inline]}
-                            on={{
-                                view: updateIndex(true),
-                                click: () => toggleOpen(true),
-                            }}
-                            carousel={{
-                                padding: 0,
-                                spacing: 0,
-                                imageFit: "cover",
-                            }}
-                            inline={{
-                                style: {
-                                    aspectRatio: "3 / 2",
-                                    margin: "0 auto",
-                                },
-                            }}
-                            slides={slides}
-                        />
+                        </section>
+                    )
+                }
 
-                        {lightboxIsOpen && (
+                {
+                    !imageFiles.length ? (
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">
+                                Select Trophy Images
+                            </h2>
+                            {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
+                            <form className="space-y-4">
+                                {imageError && (
+                                    <div className="text-red-400 text-sm">{imageErrorMessage}</div>
+                                )}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Upload Images
+                                    </label>
+                                    <input
+                                        id="imageInput"
+                                        ref={imageInputRef}
+                                        type="file"
+                                        name="file"
+                                        accept={imageFileTypes.join(',')}
+                                        multiple
+                                        onChange={checkImagesFileSize}
+                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={uploadFiles}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                >
+                                    Submit
+                                </button>
+                            </form>
+                        </section>
+                    ) : (
+                        <section>
+                            <h2 className="text-xl font-semibold text-white mb-4">
+                                Trophy Images
+                            </h2>
                             <Lightbox
                                 open={lightboxIsOpen}
                                 close={() => toggleOpen(false)}
                                 index={index}
+                                plugins={[Inline]}
+                                on={{
+                                    view: updateIndex(true),
+                                    click: () => toggleOpen(true),
+                                }}
+                                carousel={{
+                                    padding: 0,
+                                    spacing: 0,
+                                    imageFit: "cover",
+                                }}
+                                inline={{
+                                    style: {
+                                        aspectRatio: "3 / 2",
+                                        margin: "0 auto",
+                                    },
+                                }}
                                 slides={slides}
-                                on={{ view: updateIndex(true) }}
-                                animation={{ fade: 0 }}
-                                controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
                             />
-                        )}
 
-                        <Modal
-                            isOpen={isModalOpen}
-                            onClose={closeModal}
-                            title="Delete Images"
-                            size={selectedSize}
-                        >
-                            <div className="space-y-4">
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
-                                    {imageFiles.map((imageFile) => (
-                                        <div key={imageFile.name} className="flex flex-col space-y-2">
-                                            <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
-                                            <div className="relative inline-block w-32 h-32">
-                                                <Image src={imageFile.url} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
-                                                <button
-                                                    onClick={() => deleteImage(imageFile)}
-                                                    className="delete-image absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 transition-colors"
-                                                >
-                                                    ×
-                                                </button>
+                            {lightboxIsOpen && (
+                                <Lightbox
+                                    open={lightboxIsOpen}
+                                    close={() => toggleOpen(false)}
+                                    index={index}
+                                    slides={slides}
+                                    on={{ view: updateIndex(true) }}
+                                    animation={{ fade: 0 }}
+                                    controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
+                                />
+                            )}
+
+                            <Modal
+                                isOpen={isModalOpen}
+                                onClose={closeModal}
+                                title="Delete Images"
+                                size={selectedSize}
+                            >
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
+                                        {imageFiles.map((imageFile) => (
+                                            <div key={imageFile.name} className="flex flex-col space-y-2">
+                                                <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
+                                                <div className="relative inline-block w-32 h-32">
+                                                    <Image src={imageFile.url} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
+                                                    <button
+                                                        onClick={() => deleteImage(imageFile)}
+                                                        className="delete-image absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 transition-colors"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="flex space-x-3">
-                                <button
-                                    onClick={closeModal}
-                                    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={closeModal}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                                >
-                                    Save Changes
-                                </button>
-                            </div>
-                            {/* </div> */}
-                            {/* </div> */}
-                        </Modal>
-                    </section>
-                )}
+                                <div className="flex space-x-3">
+                                    <button
+                                        onClick={closeModal}
+                                        className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={closeModal}
+                                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                                {/* </div> */}
+                                {/* </div> */}
+                            </Modal>
+                        </section>
+                    )
+                }
             </div >
-            <div className='edits flex flex-col gap-2 items-start mt-4'>
-                {!!videoFile && <a
-                    className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
-                    onClick={() => replaceVideo()}
-                >
-                    Replace Video
-                </a>
-                }
-
-                {!!imageFiles.length && <a
-                    className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
-                    onClick={openEditImagesModal}
-                >
-                    Edit Images
-                </a>
-                }
-
-                {!!imageFiles.length && <a
-                    className="inline-block text-blue-400 hover:underline text-sm cursor-pointer"
-                    onClick={(showImageUpload)}
-                >
-                    Add Images
-                </a>
-                }
-
-            </div>
         </div >
     ) : (
         <LoadingSpinner />

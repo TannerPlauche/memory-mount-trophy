@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.szh-menu-container .szh-menu {
+  background-color: #697282;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.szh-menu-container .szh-menu:hover {
+  width: 100%;
+}

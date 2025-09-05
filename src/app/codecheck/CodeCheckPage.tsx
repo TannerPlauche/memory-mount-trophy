@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
-import { getLocalStorageItem, parseQueryString, setLocalStorageItem, urlDecode } from "../shared/helpers";
+import { getLocalStorageItem, parseQueryString, setVerifiedCode, urlDecode } from "../shared/helpers";
 import axios from "axios";
 
 export default function CodeCheck({ }) {
@@ -35,7 +35,7 @@ export default function CodeCheck({ }) {
             .then(response => {
                 setIsLoading(false);
                 if (response.status === 200) {
-                    setLocalStorageItem('codeVerified', true.toString());
+                    setVerifiedCode(trophyId);
                     const redirectPath = urlDecode(redirect)
                     router.push(redirectPath || `/trophy/${trophyId}`);
                 } else {
@@ -45,7 +45,7 @@ export default function CodeCheck({ }) {
             .catch(error => {
                 setIsLoading(false);
                 if (code.toLowerCase() === "abc123") {
-                    setLocalStorageItem('codeVerified', true.toString());
+                    setVerifiedCode(trophyId);
                     const redirectPath = urlDecode(redirect)
                     router.push(redirectPath || `/trophy/${trophyId}`);
                 } else {

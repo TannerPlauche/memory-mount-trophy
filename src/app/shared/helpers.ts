@@ -1,3 +1,5 @@
+import { get } from "http";
+
 export const urlEncode = (url: string) => encodeURIComponent(url);
 
 export const urlDecode = (url: string) => decodeURIComponent(url);
@@ -39,3 +41,30 @@ export const getLocalStorageItem = (key: string) => {
 
     return data;
 }
+
+const encodeId = (id: string) => {
+    return `assigned_${id}`;
+};
+
+const decodeId = (encodedId: string) => {
+    return encodedId.replace('assigned_', '');
+};
+
+export const setVerifiedCode = (id: string) => {
+    if (!window || !window.localStorage) return;
+
+    setLocalStorageItem(encodeId(id), 'id');
+};
+
+export const getVerifiedCode = (id: string) => {
+    if (!window || !window.localStorage) return null;
+
+    const data = getLocalStorageItem(encodeId(id));
+    console.log('data: ', data);
+    
+    if (data) {
+        return decodeId(data as string);
+    }
+
+    return null;
+};
