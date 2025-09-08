@@ -73,7 +73,7 @@ const GetCodePage = () => {
                 <div className="h-full flex flex-col items-center justify-start py-1 gap-3">
                     <div className="flex flex-col md:flex-row ">
                         <div className="mx-4 bg-gray-400 p-4 rounded-lg text-center mb-5 md:mb-0">
-                            <h2 className="text-lg font-light font-black text-black">Unused Memory Code:</h2>
+                            <h2 className="text-lg font-light font-black text-black">Unused Memory ID:</h2>
                             <h3 className="text-xl italic font-bold text-black">{unusedId}</h3>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={copyMemoryId}>
                                 Copy Memory Id
