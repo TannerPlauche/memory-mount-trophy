@@ -97,6 +97,8 @@ const GetCodePage = () => {
                         Get Next Memory Id
                     </button>
                     {displayMessage && <div className="message">{message}</div>}
+                    <br />
+                    <a href={`/trophy/${unusedId}`}>Open this Memory ID</a>
                 </div>
             ) : (
                 <p className="text-black text-center">Loading...</p>
