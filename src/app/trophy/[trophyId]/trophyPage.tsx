@@ -260,6 +260,11 @@ export default function TrophyPage() {
     const toggleOpen = setLightboxIsOpen;
 
     // Redirects
+    if(!isLoading && !videoFile && !imageFiles.length && !userToken) {
+        const currentRoute = urlEncode(window.location.pathname);
+        return router.push(`/login?redirect=${currentRoute}`);
+    }
+
     if (!isLoading && !videoFile && !imageFiles.length) {
         const currentRoute = urlEncode(window.location.pathname);
         if (userToken && !codeVerified) return router.push(`/codecheck?redirect=${currentRoute}&trophyId=${trophyId}`);
@@ -371,9 +376,9 @@ export default function TrophyPage() {
                     ) : (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
-                                Trophy Video
+                                Memory Mount Video
                             </h2>
-                            <ul className="mb-4 space-y-2">
+                            {/* <ul className="mb-4 space-y-2">
                                 <li>
                                     <a
                                         href={videoFile.url}
@@ -384,7 +389,7 @@ export default function TrophyPage() {
                                         {videoFile.name}
                                     </a>
                                 </li>
-                            </ul>
+                            </ul> */}
                             <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
                                 <video
                                     src={videoFile.url}
@@ -402,7 +407,7 @@ export default function TrophyPage() {
                     !imageFiles.length ? (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
-                                Select Trophy Images
+                                Select Memory Mount Images
                             </h2>
                             {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
                             <form className="space-y-4">
@@ -436,7 +441,7 @@ export default function TrophyPage() {
                     ) : (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
-                                Trophy Images
+                                Memory Mount Images
                             </h2>
                             <Lightbox
                                 open={lightboxIsOpen}
