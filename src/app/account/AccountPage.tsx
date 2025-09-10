@@ -199,7 +199,7 @@ export default function AccountPage() {
                         {[
                             { id: 'profile', label: 'Profile', icon: User },
                             // { id: 'trophies', label: 'My Trophies', icon: Award },
-                            { id: 'codes', label: 'My Memory Codes', icon: Code },
+                            { id: 'codes', label: 'My Memory Mounts', icon: Code },
                             { id: 'settings', label: 'Settings', icon: Settings }
                         ].map(({ id, label, icon: Icon }) => (
                             <button
@@ -379,7 +379,7 @@ export default function AccountPage() {
                     {activeTab === 'codes' && (
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-semibold text-white">Memory Codes</h2>
+                                <h2 className="text-xl font-semibold text-white">Memory Mounts</h2>
                                 <button
                                     onClick={() => window.location.href = 'https://www.memorymount.com'}
                                     className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -406,11 +406,12 @@ export default function AccountPage() {
                                     {memoryCodes.map((code) => (
                                         <div
                                             key={code.id}
-                                            className="bg-gray-700 border border-gray-600 rounded-lg p-4"
+                                            className="bg-gray-700 border border-gray-600 rounded-lg p-4 cursor-pointer hover:bg-gray-650 transition-colors"
+                                            onClick={() => router.push(`/trophy/${code.id}`)}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <h3 className="font-medium text-white font-mono">{code.code}</h3>
+                                                    <h3 className="font-medium text-white font-mono">{code.id}</h3>
                                                     <p className="text-sm text-gray-400">
                                                         Redeemed on {formatDate(code.usedAt)}
                                                     </p>
