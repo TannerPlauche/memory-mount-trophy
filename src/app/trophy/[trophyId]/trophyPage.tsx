@@ -44,6 +44,7 @@ export default function TrophyPage() {
         setIsModalOpen(true);
     };
     const closeModal = () => setIsModalOpen(false);
+
     // useRef to hold the file input element
     const videoInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -104,8 +105,51 @@ export default function TrophyPage() {
                 setIsLoading(false);
             }
         };
-        fetchFiles();
-    }, [trophyId]);
+
+        const verifyMountClaimed = async () => {
+            try {
+                if (!trophyId || typeof trophyId !== 'string') {
+                    setFileError(true);
+                    setFileErrorMessage('Invalid trophy ID.');
+                    setIsLoading(false);
+                    return;
+                }
+
+                const response = await fetch(`${publicPrefix || ''}/api/memory-mount/verify/${trophyId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.verified) {
+                    setCodeVerified(true);
+                } else {
+                    setCodeVerified(false);
+                    setFileError(true);
+                    setFileErrorMessage('This memory mount has not been claimed yet. Please claim it first.');
+                }
+            } catch (err) {
+                console.error('Verification error: ', err);
+                setFileError(true);
+                setFileErrorMessage('Error verifying memory mount. Please try again later.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (codeVerified && userToken) {
+            fetchFiles();
+        } else {
+            verifyMountClaimed();
+        }
+
+    }, [trophyId, codeVerified, userToken]);
 
     const sortByLastModified = (files: iTrophyFile[]) =>
         files.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
@@ -260,7 +304,7 @@ export default function TrophyPage() {
     const toggleOpen = setLightboxIsOpen;
 
     // Redirects
-    if(!isLoading && !videoFile && !imageFiles.length && !userToken) {
+    if (!isLoading && !videoFile && !imageFiles.length && !userToken) {
         const currentRoute = urlEncode(window.location.pathname);
         return router.push(`/login?redirect=${currentRoute}`);
     }
@@ -283,41 +327,48 @@ export default function TrophyPage() {
                         <MenuButton className="bg-gray-700 text-gray-100 px-4 py-2 rounded-md"><MenuAlt /></MenuButton>
                     }>
                         {!!videoFile &&
-                            <MenuItem className="w-fit">
+                            // set hover color to gray-600
+                            <div className="w-fit">
                                 <a
-                                    className="inline-block hover:underline text-sm cursor-pointer"
+                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
                                     onClick={() => replaceVideo()}
                                 >
                                     Replace Video
                                 </a>
-                            </MenuItem>}
+                            </div>}
 
                         {!!imageFiles.length &&
-                            <MenuItem className="w-fit">
+                            <div className="w-fit">
                                 <a
-                                    className="inline-block  hover:underline text-sm cursor-pointer"
+                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
                                     onClick={openEditImagesModal}
                                 >
                                     Edit Images
                                 </a>
-                            </MenuItem>
+                            </div>
                         }
                         {!!imageFiles.length &&
-                            <MenuItem className="w-fit">
+                            <div className="w-fit">
                                 <a
-                                    className="inline-block  hover:underline text-sm cursor-pointer"
+                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
                                     onClick={(showImageUpload)}
                                 >
                                     Add Images
                                 </a>
-                            </MenuItem>
+                            </div>
+                        }
+                        {!!userToken &&
+                            <div className="w-fit">
+                                <a
+                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
+                                    onClick={() => router.push(`/account?redirect=${urlEncode(window.location.pathname)}`)}
+                                >
+                                    View Account
+                                </a>
+                            </div>
                         }
                     </Menu>
                     }
-
-                    {/* </div> */}
-
-
 
                 </header>
 

@@ -1,18 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MemoryCodeService } from '@/app/services/memory-code-db.service';
+import { JWTService } from '@/app/services/jwt.service';
+import { memo } from 'react';
 
 // GET /api/memory-mount - Get memory code statistics and info
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
-    const userId = searchParams.get('userId');
     const action = searchParams.get('action');
+    const token = searchParams.get('token');
+
+    const { userId: tokenUserId } = token ? JWTService.verifyToken(token) : { userId: null };
+
+    if (tokenUserId) {
+      const memoryMounts = await MemoryCodeService.getMemoryCodesByUserId(tokenUserId);
+      if (memoryMounts.length > 0) {
+        return NextResponse.json(
+          {
+            memoryCodes: memoryMounts.map(code => ({
+              id: code.id,
+              code: code.code,
+              isUsed: code.isUsed,
+              usedAt: code.usedAt,
+              assignedToProduct: code.assignedToProduct,
+              createdAt: code.createdAt
+            }))
+          },
+          { status: 200 }
+        );
+      } else {
+        return NextResponse.json(
+          {
+            message: 'No memory codes found for user',
+            memoryCodes: []
+          },
+          { status: 404 }
+        );
+      }
+    }
 
     // Get specific memory code by code
     if (code) {
       const memoryCode = await MemoryCodeService.getMemoryCodeByCode(code);
-      
+
       if (!memoryCode) {
         return NextResponse.json(
           { error: 'Memory code not found' },
@@ -39,7 +70,7 @@ export async function GET(request: NextRequest) {
     // Get memory codes by user ID
     if (userId) {
       const memoryCodes = await MemoryCodeService.getMemoryCodesByUserId(userId);
-      
+
       return NextResponse.json(
         {
           memoryCodes: memoryCodes.map(code => ({
@@ -58,7 +89,7 @@ export async function GET(request: NextRequest) {
     // Get statistics
     if (action === 'stats') {
       const stats = await MemoryCodeService.getMemoryCodeStats();
-      
+
       return NextResponse.json(
         { stats },
         { status: 200 }
@@ -83,7 +114,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Memory mount API error:', error);
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -126,7 +157,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Validate memory code error:', error);
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

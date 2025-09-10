@@ -68,6 +68,7 @@ const GetCodePage = () => {
 
     return (
         <div className="bg-gray-500 size-dvw ">
+
             {displayMessage && <div className="message text-center">{message}</div>}
             {unusedId ? (
                 <div className="h-full flex flex-col items-center justify-start py-1 gap-3">
@@ -103,6 +104,7 @@ const GetCodePage = () => {
             ) : (
                 <p className="text-black text-center">Loading...</p>
             )}
+            
         </div>
     );
 };

@@ -29,6 +29,13 @@ export class MemoryCodeService {
     return MemoryCode.findByCode(code);
   }
 
+  // create a method that checks if a memory code exists by its id
+  static async verifyMemoryCodeById(memoryId: string): Promise<IMemoryCode | null> {
+    await dbConnect();
+    // project userId and isUsed fields only
+    return MemoryCode.findOne({ id: memoryId }, { userId: 1, isUsed: 1 });
+  }
+
   /**
    * Get memory codes by user ID
    */
