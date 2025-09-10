@@ -2,11 +2,39 @@
 // create links to other admin pages
 'use client'
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { ArrowRightOnRectangleIcon, CodeBracketIcon, DocumentTextIcon, UserGroupIcon } from "@heroicons/react/24/outline";
+import { getLocalStorageItem, urlEncode } from "../shared/helpers";
+import { useRouter } from "next/navigation";
 
 const AdminPage = () => {
-    return (
+    const router = useRouter();
+    const [isAdmin, setIsAdmin] = React.useState(false);
+    const token = getLocalStorageItem('userToken');
+
+    useEffect(() => {
+        // Check if the user is an admin
+        const checkAdmin = async () => {
+            const response = await fetch('/api/auth/me', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            setIsAdmin(data.user.admin);
+        };
+        checkAdmin();
+    }, [token]);
+
+    if (!token) {
+        router.push(`/login?redirect=${urlEncode('/account')}`);
+        return;
+    }
+
+
+    return isAdmin ? (
         <div className="min-h-screen bg-gray-900 text-white p-10">
             <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -14,7 +42,7 @@ const AdminPage = () => {
                     <div className="flex items-center">
                         <UserGroupIcon className="h-8 w-8 mr-4 text-green-400" />
                         <div>
-                            <h2 className="text-xl font-semibold">Manage Users  </h2>                                                               
+                            <h2 className="text-xl font-semibold">Manage Users  </h2>
                             <p className="mt-2 text-gray-400">View and manage user accounts</p>
                         </div>
                     </div>
@@ -48,6 +76,8 @@ const AdminPage = () => {
                 </Link>
             </div>
         </div>
+    ) : (
+        <h2 className="text-xl font-bold text-center py-20">Unauthorized</h2>
     );
 };
 

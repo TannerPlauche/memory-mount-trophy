@@ -1,5 +1,7 @@
 'use client'
+import { getLocalStorageItem, urlEncode } from "@/app/shared/helpers";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const GetCodePage = () => {
@@ -8,6 +10,26 @@ const GetCodePage = () => {
     const [unusedCode, setUnusedCode] = useState(null);
     const [message, setMessage] = useState("");
     const [displayMessage, setDisplayMessage] = useState(false);
+
+    const router = useRouter();
+    const [isAdmin, setIsAdmin] = useState(false);
+    const token = getLocalStorageItem('userToken');
+
+    useEffect(() => {
+        // Check if the user is an admin
+        const checkAdmin = async () => {
+            const response = await fetch('/api/auth/me', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            setIsAdmin(data.user.admin);
+        };
+        checkAdmin();
+    }, [token]);
 
     useEffect(() => {
         const fetchUnusedCode = async () => {
@@ -19,6 +41,13 @@ const GetCodePage = () => {
 
         fetchUnusedCode();
     }, []);
+
+
+    if (!token) {
+        router.push(`/login?redirect=${urlEncode('/account')}`);
+        return;
+    }
+
 
     const markCodeAsUsed = async () => {
         if (!unusedId) {
@@ -66,7 +95,7 @@ const GetCodePage = () => {
         }, 4000);
     };
 
-    return (
+    return isAdmin ? (
         <div className="bg-gray-500 size-dvw ">
 
             {displayMessage && <div className="message text-center">{message}</div>}
@@ -104,8 +133,10 @@ const GetCodePage = () => {
             ) : (
                 <p className="text-black text-center">Loading...</p>
             )}
-            
+
         </div>
+    ) : (
+        <h2 className="text-xl font-bold text-center py-20">Unauthorized</h2>
     );
 };
 
