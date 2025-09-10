@@ -68,8 +68,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get memory codes by user ID
-    if (userId) {
-      const memoryCodes = await MemoryCodeService.getMemoryCodesByUserId(userId);
+    if (tokenUserId) {
+      const memoryCodes = await MemoryCodeService.getMemoryCodesByUserId(tokenUserId);
 
       return NextResponse.json(
         {

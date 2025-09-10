@@ -13,7 +13,12 @@ const GetCodePage = () => {
 
     const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
-    const token = getLocalStorageItem('userToken');
+    const [token, setToken] = useState('');
+
+    useEffect(() => {
+        const token = getLocalStorageItem('userToken');
+        setToken(typeof token === 'string' ? token : '');
+    }, []);
 
     useEffect(() => {
         // Check if the user is an admin

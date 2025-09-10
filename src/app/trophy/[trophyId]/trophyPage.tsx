@@ -12,7 +12,7 @@ import 'yet-another-react-lightbox/styles.css';
 import Modal from '@/app/components/Modal/Modal';
 import { getLocalStorageItem, getVerifiedCode, urlEncode } from '@/app/shared/helpers';
 import Image from 'next/image';
-import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
+import { Menu, MenuButton } from '@szhsin/react-menu';
 import { MenuAlt } from 'geist-icons';
 import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/zoom.css';
@@ -57,7 +57,7 @@ export default function TrophyPage() {
         if (code) {
             setCodeVerified(code);
         }
-    }, []);
+    }, [trophyId]);
 
     useEffect(() => {
         const fetchFiles = async () => {

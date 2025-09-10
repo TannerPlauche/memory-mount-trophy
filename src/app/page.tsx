@@ -1,10 +1,16 @@
 'use client';
 import { useRouter } from "next/navigation";
 import { getLocalStorageItem, urlEncode } from "./shared/helpers";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const router = useRouter();
-  const token = getLocalStorageItem('userToken');
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const token = getLocalStorageItem('userToken');
+    setToken(typeof token === 'string' ? token : '');
+  }, []);
 
   if (!token) {
     router.push(`/login?redirect=${urlEncode('/account')}`);
