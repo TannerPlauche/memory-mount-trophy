@@ -59,7 +59,7 @@ export default function SignUpPage({ }) {
             <div className="max-w-md w-full bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
                 <header className="border-b border-gray-700 pb-4 mb-4">
                     <h1 className="text-2xl font-bold text-white">Sign Up</h1>
-                    <p className="text-gray-400 text-sm mt-1">Sign up to claim your Trophy Mount account</p>
+                    <p className="text-gray-400 text-sm mt-1">Sign up to claim your Memory Mount account</p>
                 </header>
                 {error && <div className="text-red-400 text-sm">{error}</div>}
                 <form className="space-y-4" onSubmit={handleSignUp}>
