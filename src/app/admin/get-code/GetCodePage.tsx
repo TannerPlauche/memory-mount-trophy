@@ -127,7 +127,7 @@ const GetCodePage = () => {
                     </button>
                     {displayMessage && <div className="message">{message}</div>}
                     <br />
-                    <a href={`/trophy/${unusedId}`}>Open this Memory ID</a>
+                    <a href={`/trophy/${unusedId}`} className="text-blue-500 hover:underline">Open this Memory ID</a>
                 </div>
             ) : (
                 <p className="text-black text-center">Loading...</p>
