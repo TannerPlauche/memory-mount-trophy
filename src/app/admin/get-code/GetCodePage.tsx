@@ -72,17 +72,18 @@ const GetCodePage = () => {
             alert("No code to copy");
         } else {
             navigator.clipboard.writeText(unusedCode);
-            setMessage("Code copied to clipboard");
+            setMessage(`Code copied to clipboard: \n ${unusedCode}`);
             displayMessageTemp();
         }
     };
 
-    const copyMemoryId = () => {
+    const copyMemoryIdWithFullUrl = () => {
         if (!unusedId) {
             alert("No Memory Id to copy");
         } else {
-            navigator.clipboard.writeText(unusedId);
-            setMessage("Memory Id copied to clipboard");
+            const fullUrl = `${window.location.origin}/trophy/${unusedId}`;
+            navigator.clipboard.writeText(fullUrl);
+            setMessage(`Memory Id copied to clipboard: \n ${fullUrl}`);
             displayMessageTemp();
         }
     };
@@ -91,20 +92,20 @@ const GetCodePage = () => {
         setDisplayMessage(true);
         setTimeout(() => {
             setDisplayMessage(false);
-        }, 4000);
+        }, 5000);
     };
 
     return isAdmin ? (
-        <div className="bg-gray-700 h-full min-h-screen p-10 text-black">
+        <div className="bg-gray-700 h-full min-h-screen p-10 text-white">
 
-            {displayMessage && <div className="message text-center">{message}</div>}
+            {displayMessage && <div className="message text-center text-l p-2 text-white">{message}</div>}
             {unusedId ? (
                 <div className="h-full flex flex-col items-center justify-start py-1 gap-3">
                     <div className="flex flex-col md:flex-row ">
                         <div className="mx-4 bg-gray-400 p-4 rounded-lg text-center mb-5 md:mb-0">
                             <h2 className="text-lg font-light font-black text-black">Unused Memory ID:</h2>
                             <h3 className="text-xl italic font-bold text-black">{unusedId}</h3>
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={copyMemoryId}>
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={copyMemoryIdWithFullUrl}>
                                 Copy Memory Id
                             </button>
                         </div>
@@ -125,7 +126,7 @@ const GetCodePage = () => {
                     <button className="bg-green-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => window.location.reload()}>
                         Get Next Memory Id
                     </button>
-                    {displayMessage && <div className="message">{message}</div>}
+                    {displayMessage && <div className="message text-white">{message}</div>}
                     <br />
                     <a href={`/trophy/${unusedId}`} className="text-blue-500 hover:underline">Open this Memory ID</a>
                 </div>
