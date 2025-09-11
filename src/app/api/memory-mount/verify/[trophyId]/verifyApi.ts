@@ -1,7 +1,21 @@
+import { JWTService } from "@/app/services/jwt.service";
 import { MemoryCodeService } from "@/app/services/memory-code-db.service";
 
 export async function GET(req: Request, { params }: { params: Promise<{ trophyId: string }> }) {
     const { trophyId } = await params;
+    const authHeader = req.headers.get('authorization');
+    let canEdit = false
+    const token = JWTService.extractTokenFromHeader(authHeader);
+    let userId = null;
+    if (token) {
+        try {
+            const decoded = JWTService.verifyToken(token);
+            userId = decoded?.userId || null;
+        } catch (error) {
+            userId = null;
+        }
+    }
+
     console.log('verifying ownership for: ', trophyId);
 
     try {
@@ -14,14 +28,19 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
             }));
         }
 
+        if (memoryMount.userId === userId) {
+            canEdit = true;
+        }
+
+
 
         if (memoryMount.isUsed && memoryMount.userId) {
-            return new Response(JSON.stringify({ success: true, verified: true, message: 'Memory mount is claimed' }), {
+            return new Response(JSON.stringify({ success: true, verified: true, canEdit, message: 'Memory mount is claimed' }), {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
             });
         } else {
-            return new Response(JSON.stringify({ success: true, verified: false, message: 'Memory mount is unclaimed' }), {
+            return new Response(JSON.stringify({ success: true, verified: false, canEdit, message: 'Memory mount is unclaimed' }), {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
             });

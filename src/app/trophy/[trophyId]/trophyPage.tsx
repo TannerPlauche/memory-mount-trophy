@@ -38,6 +38,7 @@ export default function TrophyPage() {
     const [selectedSize, setSelectedSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
     const [userToken, setUserToken] = useState('');
     const [codeVerified, setCodeVerified] = useState<string | boolean>('');
+    const [canEdit, setCanEdit] = useState(false);
 
     const openModal = (size: 'sm' | 'md' | 'lg' | 'xl') => {
         setSelectedSize(size);
@@ -119,6 +120,7 @@ export default function TrophyPage() {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userToken}`
                     },
                 });
 
@@ -129,6 +131,7 @@ export default function TrophyPage() {
                 const data = await response.json();
                 if (data.verified) {
                     setCodeVerified(true);
+                    setCanEdit(data.canEdit || false);
                 } else {
                     setCodeVerified(false);
                     setFileError(true);
@@ -323,7 +326,7 @@ export default function TrophyPage() {
                         Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
                     </p>
 
-                    {(!!videoFile || !!imageFiles.length) && <Menu menuButton={
+                    {canEdit && (!!videoFile || !!imageFiles.length) && <Menu menuButton={
                         <MenuButton className="bg-gray-700 text-gray-100 px-4 py-2 rounded-md"><MenuAlt /></MenuButton>
                     }>
                         {!!videoFile &&
