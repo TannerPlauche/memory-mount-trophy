@@ -326,10 +326,10 @@ export default function TrophyPage() {
                         Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
                     </p>
 
-                    {canEdit && (!!videoFile || !!imageFiles.length) && <Menu menuButton={
+                    {(!!videoFile || !!imageFiles.length) && <Menu menuButton={
                         <MenuButton className="bg-gray-700 text-gray-100 px-4 py-2 rounded-md"><MenuAlt /></MenuButton>
                     }>
-                        {!!videoFile &&
+                        {canEdit && !!videoFile &&
                             // set hover color to gray-600
                             <div className="w-fit">
                                 <a
@@ -340,7 +340,7 @@ export default function TrophyPage() {
                                 </a>
                             </div>}
 
-                        {!!imageFiles.length &&
+                        {canEdit && !!imageFiles.length &&
                             <div className="w-fit">
                                 <a
                                     className="inline-block hover:underline py-2 text-sm cursor-pointer"
@@ -350,7 +350,7 @@ export default function TrophyPage() {
                                 </a>
                             </div>
                         }
-                        {!!imageFiles.length &&
+                        {canEdit && !!imageFiles.length &&
                             <div className="w-fit">
                                 <a
                                     className="inline-block hover:underline py-2 text-sm cursor-pointer"
@@ -382,7 +382,7 @@ export default function TrophyPage() {
                 }
 
                 {
-                    canEdit &&!videoFile ? (
+                    canEdit && !videoFile ? (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
                                 Select a Trophy Video
