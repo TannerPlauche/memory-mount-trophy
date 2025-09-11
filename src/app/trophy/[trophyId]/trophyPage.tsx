@@ -382,7 +382,7 @@ export default function TrophyPage() {
                 }
 
                 {
-                    !videoFile ? (
+                    canEdit &&!videoFile ? (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
                                 Select a Trophy Video
@@ -458,7 +458,7 @@ export default function TrophyPage() {
                 }
 
                 {
-                    !imageFiles.length ? (
+                    canEdit && !imageFiles.length ? (
                         <section>
                             <h2 className="text-xl font-semibold text-white mb-4">
                                 Select Memory Mount Images
