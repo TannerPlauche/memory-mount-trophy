@@ -446,7 +446,7 @@ export default function TrophyPage() {
                             </ul> */}
                             <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
                                 <video
-                                    src={videoFile.url}
+                                    src={videoFile ? videoFile.url : ''}
                                     controls
                                     className="w-full max-h-[500px] bg-black"
                                 >
