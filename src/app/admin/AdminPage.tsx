@@ -34,7 +34,7 @@ const AdminPage = () => {
     }, [token]);
 
     if (!token) {
-        router.push(`/login?redirect=${urlEncode('/account')}`);
+        router.push(`/login?redirect=${urlEncode('/admin')}`);
         return;
     }
 
