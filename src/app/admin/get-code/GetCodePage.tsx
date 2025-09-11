@@ -135,8 +135,10 @@ const GetCodePage = () => {
 
         </div>
     ) : (
-        <h2 className="text-xl font-bold text-center py-20">Unauthorized</h2>
-    );
+        <div>
+            <h2 className="text-xl font-bold text-center py-20">Unauthorized</h2>
+            <a href="/login" className="text-blue-500 hover:underline">Login</a>
+        </div>);
 };
 
 export default GetCodePage;
