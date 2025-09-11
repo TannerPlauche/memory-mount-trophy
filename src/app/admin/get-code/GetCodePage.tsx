@@ -48,12 +48,6 @@ const GetCodePage = () => {
     }, []);
 
 
-    if (!token) {
-        router.push(`/login?redirect=${urlEncode('/account')}`);
-        return;
-    }
-
-
     const markCodeAsUsed = async () => {
         if (!unusedId) {
             alert("No code to mark as used");

@@ -33,11 +33,6 @@ const AdminPage = () => {
         checkAdmin();
     }, [token]);
 
-    if (!token) {
-        router.push(`/login?redirect=${urlEncode('/admin')}`);
-        return;
-    }
-
 
     return isAdmin ? (
         <div className="min-h-screen bg-gray-900 text-white p-10">
