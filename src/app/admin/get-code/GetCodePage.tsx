@@ -95,7 +95,7 @@ const GetCodePage = () => {
     };
 
     return isAdmin ? (
-        <div className="bg-gray-500 size-dvw ">
+        <div className="bg-gray-700 h-full min-h-screen p-10 text-black">
 
             {displayMessage && <div className="message text-center">{message}</div>}
             {unusedId ? (
@@ -117,7 +117,7 @@ const GetCodePage = () => {
                         </div>
                     </div>
                     <br />
-                    <small>By clicking this button you indicate that this Memory Mount Id has been assined to a product</small>
+                    <small className="px-10">By clicking this button you indicate that this Memory Mount Id has been assined to a product</small>
                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={markCodeAsUsed}>
                         Mark as Assigned to Product
                     </button>
