@@ -427,12 +427,14 @@ export default function TrophyPage() {
                                 </button>
                             )}
                         </section>
-                    ) : (
-                        <section>
-                            <h2 className="text-xl font-semibold text-white mb-4">
-                                Memory Mount Video
-                            </h2>
-                            {/* <ul className="mb-4 space-y-2">
+                    ) : null
+                }
+                {!!videoFile && (
+                    <section>
+                        <h2 className="text-xl font-semibold text-white mb-4">
+                            Memory Mount Video
+                        </h2>
+                        {/* <ul className="mb-4 space-y-2">
                                 <li>
                                     <a
                                         href={videoFile.url}
@@ -444,17 +446,17 @@ export default function TrophyPage() {
                                     </a>
                                 </li>
                             </ul> */}
-                            <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
-                                <video
-                                    src={videoFile ? videoFile.url : ''}
-                                    controls
-                                    className="w-full max-h-[500px] bg-black"
-                                >
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
-                        </section>
-                    )
+                        <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
+                            <video
+                                src={videoFile ? videoFile.url : ''}
+                                controls
+                                className="w-full max-h-[500px] bg-black"
+                            >
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </section>
+                )
                 }
 
                 {
@@ -492,90 +494,92 @@ export default function TrophyPage() {
                                 </button>
                             </form>
                         </section>
-                    ) : (
-                        <section>
-                            <h2 className="text-xl font-semibold text-white mb-4">
-                                Memory Mount Images
-                            </h2>
+                    ) : null
+                }
+                {!!imageFiles.length && (
+                    <section>
+                        <h2 className="text-xl font-semibold text-white mb-4">
+                            Memory Mount Images
+                        </h2>
+                        <Lightbox
+                            open={lightboxIsOpen}
+                            close={() => toggleOpen(false)}
+                            index={index}
+                            plugins={[Inline]}
+                            on={{
+                                view: updateIndex(true),
+                                click: () => toggleOpen(true),
+                            }}
+                            carousel={{
+                                padding: 0,
+                                spacing: 0,
+                                imageFit: "cover",
+                            }}
+                            inline={{
+                                style: {
+                                    aspectRatio: "3 / 2",
+                                    margin: "0 auto",
+                                },
+                            }}
+                            slides={slides}
+                        />
+
+                        {lightboxIsOpen && (
                             <Lightbox
                                 open={lightboxIsOpen}
                                 close={() => toggleOpen(false)}
                                 index={index}
-                                plugins={[Inline]}
-                                on={{
-                                    view: updateIndex(true),
-                                    click: () => toggleOpen(true),
-                                }}
-                                carousel={{
-                                    padding: 0,
-                                    spacing: 0,
-                                    imageFit: "cover",
-                                }}
-                                inline={{
-                                    style: {
-                                        aspectRatio: "3 / 2",
-                                        margin: "0 auto",
-                                    },
-                                }}
                                 slides={slides}
+                                on={{ view: updateIndex(true) }}
+                                animation={{ fade: 0 }}
+                                controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
                             />
+                        )}
 
-                            {lightboxIsOpen && (
-                                <Lightbox
-                                    open={lightboxIsOpen}
-                                    close={() => toggleOpen(false)}
-                                    index={index}
-                                    slides={slides}
-                                    on={{ view: updateIndex(true) }}
-                                    animation={{ fade: 0 }}
-                                    controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
-                                />
-                            )}
-
-                            <Modal
-                                isOpen={isModalOpen}
-                                onClose={closeModal}
-                                title="Delete Images"
-                                size={selectedSize}
-                            >
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
-                                        {imageFiles.map((imageFile) => (
-                                            <div key={imageFile.name} className="flex flex-col space-y-2">
-                                                <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
-                                                <div className="relative inline-block w-32 h-32">
-                                                    <Image src={imageFile.url} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
-                                                    <button
-                                                        onClick={() => deleteImage(imageFile)}
-                                                        className="delete-image absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 transition-colors"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </div>
+                        <Modal
+                            isOpen={isModalOpen}
+                            onClose={closeModal}
+                            title="Delete Images"
+                            size={selectedSize}
+                        >
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
+                                    {imageFiles.map((imageFile) => (
+                                        <div key={imageFile.name} className="flex flex-col space-y-2">
+                                            <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
+                                            <div className="relative inline-block w-32 h-32">
+                                                <Image src={imageFile.url} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
+                                                <button
+                                                    onClick={() => deleteImage(imageFile)}
+                                                    className="delete-image absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 transition-colors"
+                                                >
+                                                    ×
+                                                </button>
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
+                            </div>
 
-                                <div className="flex space-x-3">
-                                    <button
-                                        onClick={closeModal}
-                                        className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={closeModal}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                                    >
-                                        Save Changes
-                                    </button>
-                                </div>
-                                {/* </div> */}
-                                {/* </div> */}
-                            </Modal>
-                        </section>
-                    )
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={closeModal}
+                                    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={closeModal}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                            {/* </div> */}
+                            {/* </div> */}
+                        </Modal>
+                    </section>
+                )
                 }
             </div >
         </div >
