@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
-import { getLocalStorageItem, parseQueryString, setVerifiedCode, urlDecode } from "../shared/helpers";
+import { parseQueryString, setVerifiedCode, urlDecode } from "../shared/helpers";
+import { useAuthToken } from "../hooks/useAuthToken";
 import axios from "axios";
 
 export default function CodeCheck({ }) {
@@ -11,15 +12,13 @@ export default function CodeCheck({ }) {
     const [trophyId, setTrophyId] = useState("");
     const [redirect, setRedirect] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [userToken, setUserToken] = useState("");
+    const userToken = useAuthToken();
     const router = useRouter();
 
     useEffect(() => {
         const { redirect, trophyId } = parseQueryString();
-        const token = getLocalStorageItem('userToken');
         setRedirect(urlDecode(redirect));
         setTrophyId(trophyId);
-        setUserToken(typeof token === 'string' ? token : '');
     }, []);
 
     const checkCode = async (e: React.FormEvent<HTMLFormElement>) => {

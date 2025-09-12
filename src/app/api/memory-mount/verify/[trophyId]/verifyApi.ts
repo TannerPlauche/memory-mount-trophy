@@ -35,12 +35,24 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
 
 
         if (memoryMount.isUsed && memoryMount.userId) {
-            return new Response(JSON.stringify({ success: true, verified: true, canEdit, message: 'Memory mount is claimed' }), {
+            return new Response(JSON.stringify({ 
+                success: true, 
+                verified: true, 
+                canEdit, 
+                name: memoryMount.name || null,
+                message: 'Memory mount is claimed' 
+            }), {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
             });
         } else {
-            return new Response(JSON.stringify({ success: true, verified: false, canEdit, message: 'Memory mount is unclaimed' }), {
+            return new Response(JSON.stringify({ 
+                success: true, 
+                verified: false, 
+                canEdit, 
+                name: memoryMount.name || null,
+                message: 'Memory mount is unclaimed' 
+            }), {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
             });

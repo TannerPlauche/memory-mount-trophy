@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: [
       'efkxco7aewrvgfgj.public.blob.vercel-storage.com',
+      'memory-mount.s3.us-east-2.amazonaws.com',
       '*'
       // add any other domains you need
     ],

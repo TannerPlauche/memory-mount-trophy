@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
-import { getLocalStorageItem, urlEncode } from '@/app/shared/helpers';
+import { urlEncode } from '@/app/shared/helpers';
+import { useAuthToken } from '@/app/hooks/useAuthToken';
 import { User, Edit, Award, Code, LogOut, Settings, Camera, Calendar, Star } from '@geist-ui/icons';
 
 interface UserData {
@@ -10,6 +11,7 @@ interface UserData {
     email: string;
     name?: string;
     role: 'user' | 'admin';
+    admin: boolean;
     createdAt: string;
 }
 
@@ -31,6 +33,8 @@ interface Trophy {
 
 export default function AccountPage() {
     const router = useRouter();
+    const token = useAuthToken(`/login?redirect=${urlEncode('/account')}`);
+    console.log('token: ', token);
     const [isLoading, setIsLoading] = useState(true);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [memoryCodes, setMemoryCodes] = useState<MemoryCode[]>([]);
@@ -42,76 +46,75 @@ export default function AccountPage() {
     const [success, setSuccess] = useState('');
 
     useEffect(() => {
-        const token = getLocalStorageItem('userToken');
-        if (!token) {
-            router.push(`/login?redirect=${urlEncode('/account')}`);
-            return;
-        }
-
-        const fetchUserData = async () => {
-            try {
-                //set bearer token in headers
-                const response = await fetch('/api/auth/me', {
-                    headers: {
-                        Authorization: `Bearer ${token}`
+        console.log('token in use effect', token)
+        if (token) {
+            const fetchUserData = async () => {
+                try {
+                    //set bearer token in headers
+                    const response = await fetch('/api/auth/me', {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('data: ', data);
+                        setUserData(data.user);
+                        setEditForm({ name: data.user.name || '', email: data.user.email });
+                    } else {
+                        throw new Error('Failed to fetch user data');
                     }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData(data.user);
-                    setEditForm({ name: data.user.name || '', email: data.user.email });
-                } else {
-                    throw new Error('Failed to fetch user data');
+                    setIsLoading(false);
+                } catch {
+                    console.error('Error fetching user data');
+                    setError('Failed to load user data');
                 }
-                setIsLoading(false);
-            } catch {
-                console.error('Error fetching user data');
-                setError('Failed to load user data');
-            }
-        };
+            };
 
-        const fetchMemoryCodes = async () => {
-            try {
-                const response = await fetch(`/api/memory-mount?token=${token}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setMemoryCodes(data.memoryCodes || []);
+
+            const fetchMemoryCodes = async () => {
+                try {
+                    const response = await fetch(`/api/memory-mount?token=${token}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setMemoryCodes(data.memoryCodes || []);
+                    }
+                } catch {
+                    console.error('Error fetching memory codes');
                 }
-            } catch {
-                console.error('Error fetching memory codes');
-            }
-        };
+            };
 
-        const fetchTrophies = async () => {
+            const fetchTrophies = async () => {
 
-            //  {
-            //             id: 'elk-hunt-2024',
-            //             name: 'Elk Hunt 2024',
-            //             lastModified: '2024-12-01',
-            //             fileCount: 8,
-            //             hasVideo: true,
-            //             hasImages: true
-            //         },
+                //  {
+                //             id: 'elk-hunt-2024',
+                //             name: 'Elk Hunt 2024',
+                //             lastModified: '2024-12-01',
+                //             fileCount: 8,
+                //             hasVideo: true,
+                //             hasImages: true
+                //         },
 
-            try {
-                const response = await fetch(`/api/memory-mount?token=${token}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setTrophies(data.memoryCodes || []);
+                try {
+                    const response = await fetch(`/api/memory-mount?token=${token}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setTrophies(data.memoryCodes || []);
+                    }
+                } catch {
+                    console.error('Error fetching trophies');
                 }
-            } catch {
-                console.error('Error fetching trophies');
-            }
-        };
+            };
 
-        const loadData = async () => {
-            await fetchUserData();
-            await fetchMemoryCodes();
-            await fetchTrophies();
-        };
+            const loadData = async () => {
+                await fetchUserData();
+                await fetchMemoryCodes();
+                await fetchTrophies();
+            };
 
-        loadData();
-    }, [router, userData?.id]);
+            loadData();
+        }
+    }, [router, userData?.id, token]);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -123,7 +126,7 @@ export default function AccountPage() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${getLocalStorageItem('userToken')}`
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(editForm),
             });
@@ -183,13 +186,13 @@ export default function AccountPage() {
                                 </p>
                             </div>
                         </div>
-                        <button
+                        {/* <button
                             onClick={handleLogout}
                             className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
                         >
                             <LogOut size={16} />
                             <span>Logout</span>
-                        </button>
+                        </button> */}
                     </div>
                 </div>
 
@@ -235,7 +238,7 @@ export default function AccountPage() {
                     {activeTab === 'profile' && (
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-semibold text-white">Profile Information</h2>
+                                <h2 className="text-l font-semibold text-white mr-3">Profile Information</h2>
                                 <button
                                     onClick={() => setIsEditing(!isEditing)}
                                     className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -302,7 +305,7 @@ export default function AccountPage() {
                                                 ? 'bg-purple-900 text-purple-200'
                                                 : 'bg-blue-900 text-blue-200'
                                                 }`}>
-                                                {userData?.role}
+                                                {userData?.admin ? 'Admin' : userData?.role}
                                             </span>
                                         </div>
                                     </div>
@@ -462,6 +465,13 @@ export default function AccountPage() {
                         </div>
                     )}
                 </div>
+                <button
+                    onClick={handleLogout}
+                    className="flex my-5 items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                    <LogOut size={16} />
+                    <span>Logout</span>
+                </button>
             </div>
         </div>
     );

@@ -32,8 +32,8 @@ export class MemoryCodeService {
   // create a method that checks if a memory code exists by its id
   static async verifyMemoryCodeById(memoryId: string): Promise<IMemoryCode | null> {
     await dbConnect();
-    // project userId and isUsed fields only
-    return MemoryCode.findOne({ id: memoryId }, { userId: 1, isUsed: 1 });
+    // project userId, isUsed, and name fields
+    return MemoryCode.findOne({ id: memoryId }, { userId: 1, isUsed: 1, name: 1 });
   }
 
   /**
@@ -286,5 +286,23 @@ export class MemoryCodeService {
       unused,
       usagePercentage: Math.round(usagePercentage * 100) / 100
     };
+  }
+
+  /**
+   * Update memory code name
+   */
+  static async updateMemoryCodeName(memoryId: string, name: string): Promise<IMemoryCode> {
+    await dbConnect();
+    
+    try {
+      const result = await MemoryCode.updateName(memoryId, name);
+      if (!result) {
+        throw new Error('Failed to update memory code name');
+      }
+      return result;
+    } catch (error) {
+      console.error('Error updating memory code name:', error);
+      throw error;
+    }
   }
 }

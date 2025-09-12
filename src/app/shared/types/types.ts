@@ -1,4 +1,5 @@
 export interface iTrophyFile extends File {
+    id?: string;
     uploadedAt: string | number | Date;
     pathname: string;
     Key: string;

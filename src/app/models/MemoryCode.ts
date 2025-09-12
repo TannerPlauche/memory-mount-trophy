@@ -5,6 +5,7 @@ export interface IMemoryCode extends Document {
   _id: string;
   id: string; // Original id from IMountRecord
   code: string; // 6-character code from IMountRecord
+  name?: string; // Trophy/Memory Mount name
   userId?: string; // Optional user ID to associate with a user
   isUsed: boolean; // Track if the memory code has been used
   usedAt?: Date; // When the code was used
@@ -21,6 +22,7 @@ export interface IMemoryCodeModel extends Model<IMemoryCode> {
   findUnassignedCode(): Promise<IMemoryCode | null>;
   markAsAssigned(memoryId: string): Promise<IMemoryCode | null>;
   claimMemory(code: string, userId?: string): Promise<IMemoryCode | null>;
+  updateName(memoryId: string, name: string): Promise<IMemoryCode | null>;
 }
 
 // MemoryCode schema definition
@@ -39,6 +41,11 @@ const MemoryCodeSchema = new Schema<IMemoryCode>(
       uppercase: true,
       trim: true,
       length: [6, 'Code must be exactly 6 characters']
+    },
+    name: {
+      type: String,
+      trim: true,
+      required: false
     },
     userId: {
       type: String,
@@ -172,6 +179,22 @@ MemoryCodeSchema.statics.claimMemory = async function(code: string, userId?: str
   }
   
   return memoryCode.markAsUsed(userId);
+};
+
+// Static method to update the name of a memory code
+MemoryCodeSchema.statics.updateName = async function(memoryId: string, name: string) {
+  try {
+    const memoryCode = await this.findOne({ id: memoryId });
+    if (!memoryCode) {
+      throw new Error(`Memory code not found with id: ${memoryId}`);
+    }
+    
+    memoryCode.name = name;
+    return memoryCode.save();
+  } catch (error) {
+    console.error('Error updating memory code name:', error);
+    throw error;
+  }
 };
 
 // Create the model

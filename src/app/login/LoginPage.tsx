@@ -29,7 +29,7 @@ export default function LoginPage({ }) {
         //post login
         axios.post('/api/auth/login', { email, password })
             .then(response => {
-                setLocalStorageItem('userToken', response?.data?.user?.token);
+                setLocalStorageItem('userToken', response?.data?.user?.token || 'sdsdsdsfdfsdf');
                 const redirectUrl = urlDecode(redirect);
                 router.push(redirectUrl || `/trophy/${trophyId}`);
             })

@@ -36,7 +36,8 @@ export const getFiles = async (trophyId: string): Promise<iTrophyFile[]> => {
             throw new Error('Trophy ID is required');
         }
 
-        const response = await axios.get(`/api/trophy/${trophyId}`);
+        // Use S3-based API instead of Vercel Blob
+        const response = await axios.get(`/api/trophy-s3/${trophyId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching files:', error);
@@ -50,16 +51,15 @@ export const deleteFile = async (trophyId: string, file: iTrophyFile): Promise<{
             throw new Error('Trophy ID and file are required');
         }
 
-        if (!file.downloadUrl) {
-            throw new Error('File download URL is required');
+        if (!file.pathname) {
+            throw new Error('File pathname is required for S3 deletion');
         }
 
-        console.log('Deleting file:', file.name);
-        const encodedUrl = encodeURIComponent(file.downloadUrl);
-
-         await axios.delete(`/api/trophy/${trophyId}/delete`, {
+        console.log('Deleting S3 file:', file.name);
+        
+        await axios.delete(`/api/delete-s3`, {
             params: {
-                downloadUrl: encodedUrl
+                key: file.pathname
             }
         });
 
@@ -105,9 +105,14 @@ export const getFileType = <T>(file: T): string => {
         return (file as any).name.split('.').pop()?.toLowerCase() || '';
     }
 
-    // For iTrophyFile objects from storage
+    // For iTrophyFile objects from S3 storage
     if (typeof file === 'object' && file !== null && 'pathname' in file && (file as any).pathname) {
         return (file as any).pathname.split('.').pop()?.toLowerCase() || '';
+    }
+
+    // For iTrophyFile objects from Vercel Blob storage (legacy)
+    if (typeof file === 'object' && file !== null && 'url' in file && (file as any).url) {
+        return (file as any).url.split('.').pop()?.toLowerCase() || '';
     }
 
     return '';

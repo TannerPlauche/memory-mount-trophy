@@ -1,5 +1,6 @@
 'use client'
-import { getLocalStorageItem, urlEncode } from "@/app/shared/helpers";
+import { urlEncode } from "@/app/shared/helpers";
+import { useAuthToken } from "@/app/hooks/useAuthToken";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,12 +14,7 @@ const GetCodePage = () => {
 
     const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
-    const [token, setToken] = useState('');
-
-    useEffect(() => {
-        const token = getLocalStorageItem('userToken');
-        setToken(typeof token === 'string' ? token : '');
-    }, []);
+    const token = useAuthToken();
 
     useEffect(() => {
         // Check if the user is an admin

@@ -4,13 +4,13 @@ import { useEffect, useState, useRef } from 'react';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import Lightbox from 'yet-another-react-lightbox';
 import Inline from 'yet-another-react-lightbox/plugins/inline';
-import { upload } from '@vercel/blob/client';
 import { iTrophyFile } from '@/app/shared/types/types';
 import { imageFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '@/app/shared/constants/constants';
 import { deleteFile, getFiles, sortFiles, validateFiles } from '@/app/services/file.service';
 import 'yet-another-react-lightbox/styles.css';
 import Modal from '@/app/components/Modal/Modal';
-import { getLocalStorageItem, getVerifiedCode, urlEncode } from '@/app/shared/helpers';
+import { getVerifiedCode, urlEncode } from '@/app/shared/helpers';
+import { useAuthToken } from '@/app/hooks/useAuthToken';
 import Image from 'next/image';
 import { Menu, MenuButton } from '@szhsin/react-menu';
 import { MenuAlt } from 'geist-icons';
@@ -18,6 +18,28 @@ import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/zoom.css';
 
 const publicPrefix = process.env.PUBLIC_PREFIX;
+
+const uploadToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('trophyId', trophyId);
+    formData.append('fileName', fileName);
+    if (trophyName) {
+        formData.append('trophyName', trophyName);
+    }
+
+    const response = await fetch('/api/upload/s3', {
+        method: 'POST',
+        body: formData,
+    });
+
+    if (!response.ok) {
+        throw new Error('Upload failed');
+    }
+
+    const result = await response.json();
+    return result.url;
+};
 
 
 export default function TrophyPage() {
@@ -36,9 +58,11 @@ export default function TrophyPage() {
     const [index, setIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSize, setSelectedSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
-    const [userToken, setUserToken] = useState('');
+    const userToken = useAuthToken();
+    console.log('userToken: ', userToken);
     const [codeVerified, setCodeVerified] = useState<string | boolean>('');
     const [canEdit, setCanEdit] = useState(false);
+    const [memoryMountName, setMemoryMountName] = useState<string | null>(null);
 
     const openModal = (size: 'sm' | 'md' | 'lg' | 'xl') => {
         setSelectedSize(size);
@@ -52,8 +76,6 @@ export default function TrophyPage() {
     const fileNameRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        const token = getLocalStorageItem('userToken');
-        setUserToken(typeof token === 'string' ? token : '');
         const code = getVerifiedCode(trophyId as string);
         if (code) {
             setCodeVerified(code);
@@ -79,11 +101,11 @@ export default function TrophyPage() {
                     setFileError(false);
                     setFileErrorMessage('');
                     if (videoFiles.length > 0) {
-                        console.log(`Video file found: ${videoFiles[0].url}`);
+                        console.log(`Video file found: ${videoFiles[0].downloadUrl}`);
                         setVideoFile({
                             ...videoFiles[0],
-                            url: videoFiles[0].url,
-                            name: videoFiles[0].url,
+                            url: videoFiles[0].downloadUrl,
+                            name: videoFiles[0].downloadUrl,
                         });
                     }
                     const processedImageFiles = imageFiles.map((file) => ({
@@ -132,10 +154,12 @@ export default function TrophyPage() {
                 if (data.verified) {
                     setCodeVerified(true);
                     setCanEdit(data.canEdit || false);
+                    setMemoryMountName(data.name || null);
                 } else {
                     setCodeVerified(false);
                     setFileError(true);
                     setFileErrorMessage('This memory mount has not been claimed yet. Please claim it first.');
+                    setMemoryMountName(data.name || null);
                 }
             } catch (err) {
                 console.error('Verification error: ', err);
@@ -215,23 +239,18 @@ export default function TrophyPage() {
             return;
         }
         try {
+            const trophyName = fileName; // Use the fileName input as the trophy name
+
             if (selectedVideoFile) {
                 const videoFileType = selectedVideoFile.name.split('.').pop() || 'mp4';
-                const renamedFile = new File([selectedVideoFile], `${safeFileName}.${videoFileType}`, { type: videoFileType });
-                await upload(`/${trophyId}/${renamedFile.name}`, renamedFile, {
-                    access: 'public',
-                    handleUploadUrl: `/api/trophy/${trophyId}/${safeFileName}`,
-                });
+                const renamedFile = new File([selectedVideoFile], `${safeFileName}.${videoFileType}`, { type: selectedVideoFile.type });
+                await uploadToS3(renamedFile, trophyId as string, renamedFile.name, trophyName);
             }
             if (selectedImageFiles.length) {
                 await Promise.all(selectedImageFiles.map(async (imageFile) => {
-                    const imageFileType = imageFile.name.split('.').pop() || 'jpg';
                     const safeImageName = imageFile.name.replace(/[\\/\s-]/g, '_');
-                    const renamedImageFile = new File([imageFile], `${safeImageName}`, { type: imageFileType });
-                    return await upload(`/${trophyId}/${renamedImageFile.name}`, renamedImageFile, {
-                        access: 'public',
-                        handleUploadUrl: `/api/trophy/${trophyId}/${safeImageName}`,
-                    });
+                    const renamedImageFile = new File([imageFile], `${safeImageName}`, { type: imageFile.type });
+                    return await uploadToS3(renamedImageFile, trophyId as string, renamedImageFile.name, trophyName);
                 }));
             }
             setIsUploading(false);
@@ -245,14 +264,10 @@ export default function TrophyPage() {
     };
 
     const deleteImage = async (file: iTrophyFile) => {
-        if (!userToken) {
-            router.push(`/login?redirect=${urlEncode(window.location.pathname)}`);
-            return;
-        }
         if (confirm(`Are you sure you want to delete ${file.name}? This action cannot be undone.`)) {
-            const success = await deleteFile(trophyId as string, file);
-            if (success) {
-                const updatedImageFiles = imageFiles.filter((img) => img.downloadUrl !== file.downloadUrl);
+            const result = await deleteFile(trophyId as string, file);
+            if (result.success) {
+                const updatedImageFiles = imageFiles.filter((img) => img.pathname !== file.pathname);
                 setImageFiles(updatedImageFiles);
                 setSlides(updatedImageFiles.map((imageFile) => ({
                     src: imageFile.url,
@@ -277,10 +292,6 @@ export default function TrophyPage() {
     // Removed unused displayErrorTemp
 
     const replaceVideo = () => {
-        if (!userToken) {
-            router.push(`/login?redirect=${urlEncode(window.location.pathname)}`);
-            return;
-        }
         if (!confirm('Are you sure you want to replace the video? This will remove the current video.')) return;
         setVideoFile(null);
         setFileError(false);
@@ -305,7 +316,7 @@ export default function TrophyPage() {
     // Redirects
     if (!isLoading && !videoFile && !imageFiles.length && !userToken) {
         const currentRoute = urlEncode(window.location.pathname);
-        return router.push(`/login?redirect=${currentRoute}`);
+        // return router.push(`/login?redirect=${currentRoute}`);
     }
 
     if (!isLoading && !videoFile && !imageFiles.length) {
@@ -318,59 +329,17 @@ export default function TrophyPage() {
         <div className="min-h-screen bg-gray-900 py-10 px-4 md:px-10 text-gray-100">
             <div className="max-w-3xl mx-auto bg-gradient-to-br from-blue-900 via-gray-900 to-black shadow-lg rounded-lg p-6 space-y-6">
                 <header className="border-b border-gray-700 pb-4 flex justify-between">
-                    <p className="text-gray-400 text-sm mt-1">
-                        Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
-                    </p>
-
-                    {(!!videoFile || !!imageFiles.length) && <Menu menuButton={
-                        <MenuButton className="bg-gray-700 text-gray-100 px-4 py-2 rounded-md"><MenuAlt /></MenuButton>
-                    }>
-                        {canEdit && !!videoFile &&
-                            // set hover color to gray-600
-                            <div className="w-fit">
-                                <a
-                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
-                                    onClick={() => replaceVideo()}
-                                >
-                                    Replace Video
-                                </a>
-                            </div>}
-
-                        {canEdit && !!imageFiles.length &&
-                            <div className="w-fit">
-                                <a
-                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
-                                    onClick={openEditImagesModal}
-                                >
-                                    Edit Images
-                                </a>
-                            </div>
-                        }
-                        {canEdit && !!imageFiles.length &&
-                            <div className="w-fit">
-                                <a
-                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
-                                    onClick={(showImageUpload)}
-                                >
-                                    Add Images
-                                </a>
-                            </div>
-                        }
-                        {!!userToken &&
-                            <div className="w-fit">
-                                <a
-                                    className="inline-block hover:underline py-2 text-sm cursor-pointer"
-                                    onClick={() => router.push(`/account?redirect=${urlEncode(window.location.pathname)}`)}
-                                >
-                                    View Account
-                                </a>
-                            </div>
-                        }
-                    </Menu>
-                    }
-
+                    <div>
+                        <p className="text-gray-400 text-sm mt-1">
+                            Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
+                        </p>
+                        {memoryMountName && (
+                            <p className="text-gray-300 text-lg font-semibold mt-2">
+                                {memoryMountName}
+                            </p>
+                        )}
+                    </div>
                 </header>
-
                 {
                     fileError && (
                         <div className="text-red-400 text-sm">{fileErrorMessage}</div>
@@ -428,7 +397,7 @@ export default function TrophyPage() {
                 {!!videoFile && (
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4">
-                            Memory Mount Video
+                            {memoryMountName ? `${memoryMountName} Video` : 'Memory Mount Video'}
                         </h2>
                         {/* <ul className="mb-4 space-y-2">
                                 <li>
@@ -444,7 +413,7 @@ export default function TrophyPage() {
                             </ul> */}
                         <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
                             <video
-                                src={videoFile ? videoFile.url : ''}
+                                src={videoFile ? videoFile.downloadUrl : ''}
                                 controls
                                 className="w-full max-h-[500px] bg-black"
                             >
@@ -495,7 +464,7 @@ export default function TrophyPage() {
                 {!!imageFiles.length && (
                     <section>
                         <h2 className="text-xl font-semibold text-white mb-4">
-                            Memory Mount Images
+                            {memoryMountName ? `${memoryMountName} Images` : 'Memory Mount Images'}
                         </h2>
                         <Lightbox
                             open={lightboxIsOpen}
@@ -542,9 +511,9 @@ export default function TrophyPage() {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
                                     {imageFiles.map((imageFile) => (
                                         <div key={imageFile.name} className="flex flex-col space-y-2">
-                                            {/* <span className="text-sm text-gray-300 truncate">{imageFile.name}</span> */}
+                                            <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
                                             <div className="relative inline-block w-32 h-32">
-                                                <Image src={imageFile.url} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
+                                                <Image src={imageFile.downloadUrl} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
                                                 <button
                                                     onClick={() => deleteImage(imageFile)}
                                                     className="delete-image absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 transition-colors"

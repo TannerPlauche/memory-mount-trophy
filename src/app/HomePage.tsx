@@ -1,16 +1,10 @@
 'use client';
 import { useRouter } from "next/navigation";
-import { getLocalStorageItem, urlEncode } from "./shared/helpers";
-import { useEffect, useState } from "react";
+import { useAuthToken } from "./hooks/useAuthToken";
 
 export default function HomePage() {
     const router = useRouter();
-    const [token, setToken] = useState('');
-
-    useEffect(() => {
-        const t = getLocalStorageItem('userToken');
-        setToken(typeof t === 'string' ? t : '');
-    }, []);
+    const token = useAuthToken();
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-900 via-gray-900 to-black flex flex-col items-center justify-start sm:pt-[2rem] font-sans">

@@ -4,18 +4,14 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon, CodeBracketIcon, DocumentTextIcon, UserGroupIcon } from "@heroicons/react/24/outline";
-import { getLocalStorageItem, urlEncode } from "../shared/helpers";
+import { urlEncode } from "../shared/helpers";
 import { useRouter } from "next/navigation";
+import { useAuthToken } from "../hooks/useAuthToken";
 
 const AdminPage = () => {
     const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
-    const [token, setToken] = useState('');
-
-    useEffect(() => {
-        const token = getLocalStorageItem('userToken');
-        setToken(typeof token === 'string' ? token : '');
-    }, []);
+    const token = useAuthToken();
 
     useEffect(() => {
         // Check if the user is an admin
