@@ -34,11 +34,16 @@ export async function POST(request: NextRequest) {
             Bucket: S3_BUCKET,
             Key: key,
             ContentType: fileType,
+            // Remove automatic checksum that might cause issues
+            ChecksumAlgorithm: undefined,
         });
 
         // Generate presigned URL that expires in 10 minutes
         const presignedUrl = await getSignedUrl(s3Client, command, { 
-            expiresIn: 600 
+            expiresIn: 600,
+            // Ensure only the necessary headers are signed
+            unhoistableHeaders: new Set(),
+            signableHeaders: new Set(['content-type'])
         });
 
         const fileUrl = `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
