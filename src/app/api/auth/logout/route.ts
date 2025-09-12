@@ -36,11 +36,11 @@ export async function POST(request: NextRequest) {
       message: 'Successfully logged out'
     });
 
-  } catch (error) {
-    console.error('Logout error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+    } catch {
+        console.error('Logout error');
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
 }

@@ -2,22 +2,17 @@
 import { urlEncode } from "@/app/shared/helpers";
 import { useAuthToken } from "@/app/hooks/useAuthToken";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const GetCodePage = () => {
-    // fetch an unused memory code from the database
     const [unusedId, setUnusedId] = useState(null);
     const [unusedCode, setUnusedCode] = useState(null);
     const [message, setMessage] = useState("");
     const [displayMessage, setDisplayMessage] = useState(false);
-
-    const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
     const token = useAuthToken();
 
     useEffect(() => {
-        // Check if the user is an admin
         const checkAdmin = async () => {
             const response = await fetch('/api/auth/me', {
                 method: 'GET',
@@ -99,14 +94,14 @@ const GetCodePage = () => {
                 <div className="h-full flex flex-col items-center justify-start py-1 gap-3">
                     <div className="flex flex-col md:flex-row ">
                         <div className="mx-4 bg-gray-400 p-4 rounded-lg text-center mb-5 md:mb-0">
-                            <h2 className="text-lg font-light font-black text-black">Unused Memory ID:</h2>
+                            <h2 className="text-lg font-black text-black">Unused Memory ID:</h2>
                             <h3 className="text-xl italic font-bold text-black">{unusedId}</h3>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={copyMemoryIdWithFullUrl}>
                                 Copy Memory Id
                             </button>
                         </div>
                         <div className="mx-4 bg-gray-400 p-4 rounded-lg text-center">
-                            <h2 className="text-lg font-light font-black text-black">Unused Memory Code:</h2>
+                            <h2 className="text-lg font-black text-black">Unused Memory Code:</h2>
                             <h3 className="text-xl italic font-bold text-black">{unusedCode}</h3>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={copyCode}>
                                 Copy Code

@@ -1,17 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { JWTService } from '@/app/services/jwt.service';
 import { UserService } from '@/app/services/user.service';
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
 
 export async function POST(request: NextRequest) {
   try {

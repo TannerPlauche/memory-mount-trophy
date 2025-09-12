@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MemoryCodeService } from '@/app/services/memory-code-db.service';
 import { JWTService } from '@/app/services/jwt.service';
-import { memo } from 'react';
 
-// GET /api/memory-mount - Get memory code statistics and info
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -122,7 +120,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/memory-mount - Validate memory code
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

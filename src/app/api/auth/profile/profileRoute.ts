@@ -23,11 +23,10 @@ export async function PUT(req: Request) {
         );
     }
 
-    // Verify the JWT token
     try {
        const {userId: tokenUserId} = JWTService.verifyToken(token);
        userId = tokenUserId;
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'Invalid or expired token' },
             { status: 401 }

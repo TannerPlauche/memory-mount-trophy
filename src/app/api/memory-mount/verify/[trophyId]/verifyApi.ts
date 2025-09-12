@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
         try {
             const decoded = JWTService.verifyToken(token);
             userId = decoded?.userId || null;
-        } catch (error) {
+        } catch {
             userId = null;
         }
     }
@@ -31,8 +31,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
         if (memoryMount.userId === userId) {
             canEdit = true;
         }
-
-
 
         if (memoryMount.isUsed && memoryMount.userId) {
             return new Response(JSON.stringify({ 

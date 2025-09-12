@@ -8,19 +8,17 @@ import {
     sortFiles,
     validateFiles
 } from '../file.service';
-import { del, list, put } from '@vercel/blob';
+import { list, put } from '@vercel/blob';
 import axios from 'axios';
 import { iTrophyFile } from '../../shared/types/types';
 import { MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '../../shared/constants/constants';
 
-// Mock dependencies
 jest.mock('@vercel/blob');
 jest.mock('axios');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedPut = put as jest.MockedFunction<typeof put>;
 const mockedList = list as jest.MockedFunction<typeof list>;
-const mockedDel = del as jest.MockedFunction<typeof del>;
 
 describe('file.service', () => {
     beforeEach(() => {

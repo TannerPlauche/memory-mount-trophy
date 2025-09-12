@@ -39,16 +39,12 @@ export async function POST(request: Request, { params }: RouteParams): Promise<N
                     } as TokenPayload),
                 };
             },
-            onUploadCompleted: async ({ blob: _blob, tokenPayload }) => {
-                // Get notified of client upload completion
-                // ⚠️ This will not work on `localhost` websites,
-                // Use ngrok or similar to get the full upload flow
-
+            onUploadCompleted: async ({ blob, tokenPayload }) => {
                 if (tokenPayload) {
                     try {
                         const payload: TokenPayload = JSON.parse(tokenPayload);
-                        // Run any logic after the file upload completed
                         console.log('Upload completed for trophy:', payload.trophyId, 'file:', payload.fileName);
+                        console.log('Blob URL:', blob.url);
                     } catch (error) {
                         console.error('Error processing upload completion:', error);
                         throw new Error('Could not process upload completion');

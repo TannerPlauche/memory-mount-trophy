@@ -1,8 +1,4 @@
-// Migration script to import memory codes from JSON file to MongoDB
-// This script can be run to populate the database with existing memory codes
-
 import { MemoryCodeService } from './memory-code-db.service';
-import { IMemoryCode } from '@/app/models/MemoryCode';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -13,14 +9,12 @@ interface IMountRecord {
 
 export async function migrateMemoryCodesFromJson(): Promise<void> {
   try {
-    // Read the memory-codes.json file
     const jsonPath = join(process.cwd(), 'memory-codes.json');
     const jsonData = readFileSync(jsonPath, 'utf8');
     const memoryCodes: IMountRecord[] = JSON.parse(jsonData);
 
     console.log(`Found ${memoryCodes.length} memory codes in JSON file`);
 
-    // Bulk create memory codes in the database
     const result = await MemoryCodeService.bulkCreateMemoryCodes(memoryCodes);
 
     console.log('Migration completed:');
@@ -32,7 +26,6 @@ export async function migrateMemoryCodesFromJson(): Promise<void> {
       result.errors.forEach(error => console.error(`  ${error}`));
     }
 
-    // Show stats
     const stats = await MemoryCodeService.getMemoryCodeStats();
     console.log('\nDatabase statistics:');
     console.log(`- Total codes: ${stats.total}`);
@@ -46,11 +39,7 @@ export async function migrateMemoryCodesFromJson(): Promise<void> {
   }
 }
 
-// Example usage functions
 export class MemoryCodeExamples {
-  /**
-   * Example: Redeem a memory code for a user
-   */
   static async redeemMemoryCode(code: string, userId: string): Promise<{
     success: boolean;
     message: string;
@@ -62,7 +51,6 @@ export class MemoryCodeExamples {
     };
   }> {
     try {
-      // First validate the code
       const validation = await MemoryCodeService.validateMemoryCode(code);
       
       if (!validation.isValid) {
@@ -72,7 +60,6 @@ export class MemoryCodeExamples {
         };
       }
 
-      // Mark the code as used by the user
       const usedCode = await MemoryCodeService.markMemoryCodeAsUsed(code, userId);
       
       return {
@@ -94,9 +81,6 @@ export class MemoryCodeExamples {
     }
   }
 
-  /**
-   * Example: Get user's redeemed memory codes
-   */
   static async getUserMemoryCodes(userId: string) {
     try {
       const memoryCodes = await MemoryCodeService.getMemoryCodesByUserId(userId);

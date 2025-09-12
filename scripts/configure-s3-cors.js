@@ -1,10 +1,12 @@
-const { S3Client, PutBucketCorsCommand, GetBucketCorsCommand } = require('@aws-sdk/client-s3');
+// S3 CORS Configuration Script
+// This script configures CORS settings for the S3 bucket to allow browser uploads
+// Run with: node scripts/configure-s3-cors.js
 
-// Load environment variables from .env.local
+const { S3Client, PutBucketCorsCommand, GetBucketCorsCommand } = require('@aws-sdk/client-s3');
 const fs = require('fs');
 const path = require('path');
 
-// Simple dotenv replacement
+// Load environment variables from .env.local
 const envPath = path.join(__dirname, '..', '.env.local');
 if (fs.existsSync(envPath)) {
     const envContent = fs.readFileSync(envPath, 'utf8');

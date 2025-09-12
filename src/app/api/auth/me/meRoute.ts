@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JWTService } from '@/app/services/jwt.service';
-import { User } from 'geist-icons';
 import { UserService } from '@/app/services/user.service';
 
 export async function GET(request: NextRequest) {
@@ -24,7 +23,6 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Verify and decode the JWT token
         let decoded;
         try {
             decoded = JWTService.verifyToken(token);

@@ -2,18 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { UserService } from '@/app/services/user.service';
 import { JWTService } from '@/app/services/jwt.service';
 
-interface SignupRequest {
-    email: string;
-    password: string;
-    name: string;
-}
-
-interface User {
-    id: string;
-    email: string;
-    name: string;
-}
-
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();

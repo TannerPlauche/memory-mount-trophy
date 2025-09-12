@@ -1,20 +1,16 @@
 // AdminPage.tsx
-// create links to other admin pages
 'use client'
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon, CodeBracketIcon, DocumentTextIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { urlEncode } from "../shared/helpers";
-import { useRouter } from "next/navigation";
 import { useAuthToken } from "../hooks/useAuthToken";
 
 const AdminPage = () => {
-    const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
     const token = useAuthToken();
 
     useEffect(() => {
-        // Check if the user is an admin
         const checkAdmin = async () => {
             const response = await fetch('/api/auth/me', {
                 method: 'GET',

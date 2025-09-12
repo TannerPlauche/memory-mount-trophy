@@ -41,7 +41,7 @@ export default function CodeCheck({ }) {
                     setError(response.data.message);
                 }
             })
-            .catch(error => {
+            .catch(() => {
                 setIsLoading(false);
                 if (code.toLowerCase() === "abc123") {
                     setVerifiedCode(trophyId);

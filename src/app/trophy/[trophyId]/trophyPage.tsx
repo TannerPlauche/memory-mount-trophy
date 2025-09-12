@@ -12,8 +12,6 @@ import Modal from '@/app/components/Modal/Modal';
 import { getVerifiedCode, urlEncode } from '@/app/shared/helpers';
 import { useAuthToken } from '@/app/hooks/useAuthToken';
 import Image from 'next/image';
-import { Menu, MenuButton } from '@szhsin/react-menu';
-import { MenuAlt } from 'geist-icons';
 import '@szhsin/react-menu/dist/index.css';
 import '@szhsin/react-menu/dist/transitions/zoom.css';
 
@@ -38,7 +36,6 @@ export default function TrophyPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSize, setSelectedSize] = useState<'sm' | 'md' | 'lg' | 'xl'>('md');
     const userToken = useAuthToken();
-    console.log('userToken: ', userToken);
     const [codeVerified, setCodeVerified] = useState<string | boolean>('');
     const [canEdit, setCanEdit] = useState(false);
     const [memoryMountName, setMemoryMountName] = useState<string | null>(null);
@@ -397,8 +394,7 @@ export default function TrophyPage() {
 
     // Redirects
     if (!isLoading && !videoFile && !imageFiles.length && !userToken) {
-        const currentRoute = urlEncode(window.location.pathname);
-        // return router.push(`/login?redirect=${currentRoute}`);
+        // Redirect handled below
     }
 
     if (!isLoading && !videoFile && !imageFiles.length) {

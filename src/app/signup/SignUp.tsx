@@ -47,7 +47,7 @@ export default function SignUpPage({ }) {
                 localStorage.setItem("token", data.user.token);
                 router.push(redirect);
             }
-        }).catch((error) => {
+        }).catch(() => {
             setIsLoading(false);
             setError("Registration failed.");
         });
