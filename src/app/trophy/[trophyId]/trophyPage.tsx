@@ -291,11 +291,7 @@ export default function TrophyPage() {
 
     // Removed unused openEditImagesModal
     const openEditImagesModal = () => {
-        if (!userToken) {
-            router.push(`/login?redirect=${urlEncode(window.location.pathname)}`);
-            return;
-        }
-
+        if (!confirm('Are you sure you want to edit images? Deleted images cannot be recovered.')) return;
         openModal('md')
     }
 
@@ -320,7 +316,7 @@ export default function TrophyPage() {
 
     return !isLoading ? (
         <div className="min-h-screen bg-gray-900 py-10 px-4 md:px-10 text-gray-100">
-            <div className="max-w-3xl mx-auto bg-gray-800 shadow-lg rounded-lg p-6 space-y-6">
+            <div className="max-w-3xl mx-auto bg-gradient-to-br from-blue-900 via-gray-900 to-black shadow-lg rounded-lg p-6 space-y-6">
                 <header className="border-b border-gray-700 pb-4 flex justify-between">
                     <p className="text-gray-400 text-sm mt-1">
                         Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
@@ -546,7 +542,7 @@ export default function TrophyPage() {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
                                     {imageFiles.map((imageFile) => (
                                         <div key={imageFile.name} className="flex flex-col space-y-2">
-                                            <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
+                                            {/* <span className="text-sm text-gray-300 truncate">{imageFile.name}</span> */}
                                             <div className="relative inline-block w-32 h-32">
                                                 <Image src={imageFile.url} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
                                                 <button
@@ -581,6 +577,44 @@ export default function TrophyPage() {
                     </section>
                 )
                 }
+                {/* Move menu items down here */}
+                {canEdit && <hr className="border-gray-700 p-0 m-0" />}
+                <h3 className='text-lg font-semibold p-2 m-0 text-center'>Owner Tools</h3>
+                {/* {canEdit && <hr className="border-gray-700 p-0 m-0" />} */}
+                <div className="mt-3 flex flex-col flex-wrap gap-4 justify-center">
+                    {canEdit && !!videoFile && (
+                        <button
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
+                            onClick={replaceVideo}
+                        >
+                            Replace Video
+                        </button>
+                    )}
+                    {canEdit && !!imageFiles.length && (
+                        <button
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
+                            onClick={openEditImagesModal}
+                        >
+                            Edit Images
+                        </button>
+                    )}
+                    {canEdit && !!imageFiles.length && (
+                        <button
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
+                            onClick={showImageUpload}
+                        >
+                            Add Images
+                        </button>
+                    )}
+                    {!!userToken && (
+                        <button
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
+                            onClick={() => router.push(`/account?redirect=${urlEncode(window.location.pathname)}`)}
+                        >
+                            View Account
+                        </button>
+                    )}
+                </div>
             </div >
         </div >
     ) : (

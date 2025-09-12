@@ -16,7 +16,13 @@ const nextConfig: NextConfig = {
       }
     ]
   },
-  BLOB_READ_WRITE_TOKEN: "vercel_blob_rw_EFKxcO7AEWrVgfGj_eOM9YZbCqXL5ezxBgirFDYpDHhehEZ"
+  images: {
+    domains: [
+      'efkxco7aewrvgfgj.public.blob.vercel-storage.com',
+      '*'
+      // add any other domains you need
+    ],
+  },
 };
 
 export default nextConfig;

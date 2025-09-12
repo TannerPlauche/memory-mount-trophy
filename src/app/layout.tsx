@@ -24,13 +24,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="bg-gray-500 flex items-center justify-center py-1">
-          <Image src={logo} alt="Logo" height={150} />
+          <a href="https://memorymount.com" target="_blank" rel="noopener noreferrer">
+            <Image src={logo} alt="Logo" height={100} />
+          </a>
         </div>
         {children}
       </body>
