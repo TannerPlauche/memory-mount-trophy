@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { S3Client } from '@aws-sdk/client-s3';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 
 const AWS_REGION = process.env.AWS_REGION || 'us-east-2';
 const S3_BUCKET = process.env.AWS_S3_BUCKET || 'memory-mount';
@@ -30,27 +30,28 @@ export async function POST(request: NextRequest) {
 
         const key = `${S3_FOLDER}${trophyId}/${fileName}`;
 
-        const command = new PutObjectCommand({
+        // Use createPresignedPost instead of getSignedUrl for better browser compatibility
+        const { url, fields } = await createPresignedPost(s3Client, {
             Bucket: S3_BUCKET,
             Key: key,
-            ContentType: fileType,
-            // Remove automatic checksum that might cause issues
-            ChecksumAlgorithm: undefined,
-        });
-
-        // Generate presigned URL that expires in 10 minutes
-        const presignedUrl = await getSignedUrl(s3Client, command, { 
-            expiresIn: 600,
-            // Ensure only the necessary headers are signed
-            unhoistableHeaders: new Set(),
-            signableHeaders: new Set(['content-type'])
+            Conditions: [
+                ['content-length-range', 0, 100 * 1024 * 1024], // 100MB max
+                ['eq', '$Content-Type', fileType]
+            ],
+            Fields: {
+                'Content-Type': fileType,
+            },
+            Expires: 600, // 10 minutes
         });
 
         const fileUrl = `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
 
         return NextResponse.json({
             success: true,
-            presignedUrl,
+            presignedPost: {
+                url,
+                fields
+            },
             fileUrl,
             key
         });

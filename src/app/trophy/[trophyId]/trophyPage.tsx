@@ -59,7 +59,7 @@ export default function TrophyPage() {
         try {
             setUploadProgress('Getting upload URL...');
             
-            // Step 1: Get presigned URL
+            // Step 1: Get presigned POST data
             const presignedResponse = await fetch('/api/upload/s3-presigned', {
                 method: 'POST',
                 headers: {
@@ -76,17 +76,24 @@ export default function TrophyPage() {
                 throw new Error('Failed to get presigned URL');
             }
 
-            const { presignedUrl, fileUrl } = await presignedResponse.json();
+            const { presignedPost, fileUrl } = await presignedResponse.json();
 
             setUploadProgress('Uploading to cloud storage...');
             
-            // Step 2: Upload directly to S3 using presigned URL
-            const uploadResponse = await fetch(presignedUrl, {
-                method: 'PUT',
-                body: file,
-                headers: {
-                    'Content-Type': file.type,
-                },
+            // Step 2: Upload directly to S3 using presigned POST
+            const formData = new FormData();
+            
+            // Add all the required fields from the presigned post
+            Object.entries(presignedPost.fields).forEach(([key, value]) => {
+                formData.append(key, value as string);
+            });
+            
+            // Add the file last
+            formData.append('file', file);
+
+            const uploadResponse = await fetch(presignedPost.url, {
+                method: 'POST',
+                body: formData,
             });
 
             if (!uploadResponse.ok) {

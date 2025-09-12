@@ -44,10 +44,13 @@ const corsConfiguration = {
             AllowedMethods: ['GET', 'PUT', 'POST', 'DELETE', 'HEAD'],
             AllowedOrigins: [
                 'http://localhost:3000',
+                'http://localhost:3001',
                 'https://*.vercel.app',
                 'https://memory-mount.vercel.app',
                 'https://www.memorymount.com',
-                'https://memorymount.com'
+                'https://memorymount.com',
+                'https://www.memorymount.app',
+                'https://memorymount.app'
             ],
             ExposeHeaders: ['ETag'],
             MaxAgeSeconds: 3000,
