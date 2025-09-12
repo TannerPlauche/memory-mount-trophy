@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
+const AWS_REGION = process.env.AWS_REGION || 'us-east-2';
+const S3_BUCKET = process.env.AWS_S3_BUCKET || 'memory-mount';
+const S3_FOLDER = process.env.AWS_S3_FOLDER || 'uploads/';
+
 const s3Client = new S3Client({
-    region: process.env.AWS_REGION || 'us-east-2',
+    region: AWS_REGION,
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     },
+    forcePathStyle: false, // Use virtual-hosted-style URLs
+    endpoint: `https://s3.${AWS_REGION}.amazonaws.com`, // Explicit endpoint
 });
-
-const S3_BUCKET = process.env.AWS_S3_BUCKET || 'memory-mount';
-const S3_FOLDER = process.env.AWS_S3_FOLDER || 'uploads/';
 
 export async function GET(
     request: NextRequest,
@@ -44,8 +47,8 @@ export async function GET(
             .map(obj => ({
                 id: obj.Key,
                 name: obj.Key?.split('/').pop() || '',
-                url: `https://${S3_BUCKET}.s3.us-east-2.amazonaws.com/${obj.Key}`,
-                downloadUrl: `https://${S3_BUCKET}.s3.us-east-2.amazonaws.com/${obj.Key}`,
+                url: `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${obj.Key}`,
+                downloadUrl: `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${obj.Key}`,
                 pathname: obj.Key,
                 size: obj.Size || 0,
                 uploadedAt: obj.LastModified?.toISOString() || new Date().toISOString(),

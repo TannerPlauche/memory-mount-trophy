@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { MemoryCodeService } from '@/app/services/memory-code-db.service';
 
+const AWS_REGION = process.env.AWS_REGION || 'us-east-2';
+const S3_BUCKET = process.env.AWS_S3_BUCKET || 'memory-mount';
+const S3_FOLDER = process.env.AWS_S3_FOLDER || 'uploads/';
+
 const s3Client = new S3Client({
-    region: process.env.AWS_REGION || 'us-east-2',
+    region: AWS_REGION,
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     },
+    forcePathStyle: false, // Use virtual-hosted-style URLs
+    endpoint: `https://s3.${AWS_REGION}.amazonaws.com`, // Explicit endpoint
 });
-
-const S3_BUCKET = process.env.AWS_S3_BUCKET || 'memory-mount';
-const S3_FOLDER = process.env.AWS_S3_FOLDER || 'uploads/';
 
 export async function POST(request: NextRequest) {
     try {
@@ -51,7 +54,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const fileUrl = `https://${S3_BUCKET}.s3.us-east-2.amazonaws.com/${key}`;
+        const fileUrl = `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
 
         return NextResponse.json({
             success: true,
