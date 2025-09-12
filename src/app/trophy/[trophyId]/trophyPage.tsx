@@ -9,7 +9,7 @@ import { imageFileTypes, MAX_IMAGE_FILE_SIZE, MAX_VIDEO_FILE_SIZE } from '@/app/
 import { deleteFile, getFiles, sortFiles, validateFiles } from '@/app/services/file.service';
 import 'yet-another-react-lightbox/styles.css';
 import Modal from '@/app/components/Modal/Modal';
-import { getVerifiedCode, urlEncode } from '@/app/shared/helpers';
+import { getLocalStorageItem, getVerifiedCode, urlEncode } from '@/app/shared/helpers';
 import { useAuthToken } from '@/app/hooks/useAuthToken';
 import Image from 'next/image';
 import '@szhsin/react-menu/dist/index.css';
@@ -20,7 +20,8 @@ const publicPrefix = process.env.PUBLIC_PREFIX;
 
 export default function TrophyPage() {
     const router = useRouter();
-    const { trophyId } = useParams();
+    const params = useParams();
+    const trophyId = Array.isArray(params.trophyId) ? params.trophyId[0] : params.trophyId;
     const [fileError, setFileError] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [fileErrorMessage, setFileErrorMessage] = useState('');
@@ -40,9 +41,14 @@ export default function TrophyPage() {
     const [canEdit, setCanEdit] = useState(false);
     const [memoryMountName, setMemoryMountName] = useState<string | null>(null);
 
+    const parseTrophyIdFromUrl = () => {
+        const trophyId = Array.isArray(params.trophyId) ? params.trophyId[0] : params.trophyId;
+        return trophyId;
+    };
+
     const uploadToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
         const fileSizeLimit = 4 * 1024 * 1024; // 4MB - Vercel function payload limit
-        
+
         if (file.size > fileSizeLimit) {
             // Use presigned URL for large files
             return uploadLargeFileToS3(file, trophyId, fileName, trophyName);
@@ -55,7 +61,7 @@ export default function TrophyPage() {
     const uploadLargeFileToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
         try {
             setUploadProgress('Getting upload URL...');
-            
+
             // Step 1: Get presigned POST data
             const presignedResponse = await fetch('/api/upload/s3-presigned', {
                 method: 'POST',
@@ -76,15 +82,15 @@ export default function TrophyPage() {
             const { presignedPost, fileUrl } = await presignedResponse.json();
 
             setUploadProgress('Uploading to cloud storage...');
-            
+
             // Step 2: Upload directly to S3 using presigned POST
             const formData = new FormData();
-            
+
             // Add all the required fields from the presigned post
             Object.entries(presignedPost.fields).forEach(([key, value]) => {
                 formData.append(key, value as string);
             });
-            
+
             // Add the file last
             formData.append('file', file);
 
@@ -155,7 +161,10 @@ export default function TrophyPage() {
     const fileNameRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        const code = getVerifiedCode(trophyId as string);
+        if (!trophyId || typeof trophyId !== 'string') {
+            return;
+        }
+        const code = getVerifiedCode(trophyId);
         if (code) {
             setCodeVerified(code);
         }
@@ -163,6 +172,7 @@ export default function TrophyPage() {
 
     useEffect(() => {
         const fetchFiles = async () => {
+            const trophyId = parseTrophyIdFromUrl();
             try {
                 if (!trophyId || typeof trophyId !== 'string') {
                     setFileError(true);
@@ -209,6 +219,8 @@ export default function TrophyPage() {
         };
 
         const verifyMountClaimed = async () => {
+            const userToken = getLocalStorageItem('userToken');
+
             try {
                 if (!trophyId || typeof trophyId !== 'string') {
                     setFileError(true);
@@ -221,7 +233,7 @@ export default function TrophyPage() {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${userToken}`
+                        ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {})
                     },
                 });
 
@@ -233,6 +245,7 @@ export default function TrophyPage() {
                 if (data.verified) {
                     setCodeVerified(true);
                     setCanEdit(data.canEdit || false);
+                    console.log('canEdit: ', data.canEdit || false);
                     setMemoryMountName(data.name || null);
                 } else {
                     setCodeVerified(false);
@@ -248,6 +261,11 @@ export default function TrophyPage() {
                 setIsLoading(false);
             }
         };
+
+        // Early return if trophyId is not ready
+        if (!trophyId) {
+            return;
+        }
 
         if (codeVerified && userToken) {
             fetchFiles();
@@ -399,7 +417,11 @@ export default function TrophyPage() {
 
     if (!isLoading && !videoFile && !imageFiles.length) {
         const currentRoute = urlEncode(window.location.pathname);
-        if (userToken && !codeVerified) return router.push(`/codecheck?redirect=${currentRoute}&trophyId=${trophyId}`);
+        if (userToken && !codeVerified) {
+            if (trophyId) {
+                return router.push(`/codecheck?redirect=${currentRoute}&trophyId=${trophyId}`);
+            }
+        }
         if (!userToken) return router.push(`/login?redirect=${currentRoute}`);
     }
 

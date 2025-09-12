@@ -10,17 +10,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
     if (token) {
         try {
             const decoded = JWTService.verifyToken(token);
+            console.log('decoded: ', decoded);
             userId = decoded?.userId || null;
         } catch {
             userId = null;
         }
     }
 
-    console.log('verifying ownership for: ', trophyId);
-
     try {
         const memoryMount = await MemoryCodeService.verifyMemoryCodeById(trophyId);
-        console.log('memoryMount: ', memoryMount);
         if (!memoryMount) {
             return new Response(JSON.stringify({
                 verified: false,
@@ -28,6 +26,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
             }));
         }
 
+        console.log('memoryMount.userId === userId', memoryMount.userId, userId, memoryMount.userId === userId);
         if (memoryMount.userId === userId) {
             canEdit = true;
         }
