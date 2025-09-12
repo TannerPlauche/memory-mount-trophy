@@ -41,11 +41,6 @@ export default function TrophyPage() {
     const [canEdit, setCanEdit] = useState(false);
     const [memoryMountName, setMemoryMountName] = useState<string | null>(null);
 
-    const parseTrophyIdFromUrl = () => {
-        const trophyId = Array.isArray(params.trophyId) ? params.trophyId[0] : params.trophyId;
-        return trophyId;
-    };
-
     const uploadToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
         const fileSizeLimit = 4 * 1024 * 1024; // 4MB - Vercel function payload limit
 
@@ -172,7 +167,6 @@ export default function TrophyPage() {
 
     useEffect(() => {
         const fetchFiles = async () => {
-            const trophyId = parseTrophyIdFromUrl();
             try {
                 if (!trophyId || typeof trophyId !== 'string') {
                     setFileError(true);

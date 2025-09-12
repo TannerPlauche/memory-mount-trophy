@@ -16,13 +16,14 @@ export async function GET(request: NextRequest) {
       if (memoryMounts.length > 0) {
         return NextResponse.json(
           {
-            memoryCodes: memoryMounts.map(code => ({
-              id: code.id,
-              code: code.code,
-              isUsed: code.isUsed,
-              usedAt: code.usedAt,
-              assignedToProduct: code.assignedToProduct,
-              createdAt: code.createdAt
+            memoryCodes: memoryMounts.map(mount => ({
+              id: mount.id,
+              code: mount.code,
+              isUsed: mount.isUsed,
+              name: mount.name,
+              usedAt: mount.usedAt,
+              assignedToProduct: mount.assignedToProduct,
+              createdAt: mount.createdAt
             }))
           },
           { status: 200 }

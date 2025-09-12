@@ -20,6 +20,8 @@ interface MemoryCode {
     code: string;
     usedAt: string;
     createdAt: string;
+    name?: string;
+    userId?: string;
 }
 
 interface Trophy {
@@ -406,17 +408,17 @@ export default function AccountPage() {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    {memoryCodes.map((code) => (
+                                    {memoryCodes.map((mount) => (
                                         <div
-                                            key={code.id}
+                                            key={mount.id}
                                             className="bg-gray-700 border border-gray-600 rounded-lg p-4 cursor-pointer hover:bg-gray-650 transition-colors"
-                                            onClick={() => router.push(`/trophy/${code.id}`)}
+                                            onClick={() => router.push(`/trophy/${mount.id}`)}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <h3 className="font-medium text-white font-mono">{code.id}</h3>
+                                                    <h3 className="font-medium text-white font-mono">{mount.name || mount.id}</h3>
                                                     <p className="text-sm text-gray-400">
-                                                        Redeemed on {formatDate(code.usedAt)}
+                                                        Redeemed on {formatDate(mount.usedAt)}
                                                     </p>
                                                 </div>
                                                 <div className="text-right">
