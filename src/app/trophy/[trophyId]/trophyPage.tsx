@@ -19,28 +19,6 @@ import '@szhsin/react-menu/dist/transitions/zoom.css';
 
 const publicPrefix = process.env.PUBLIC_PREFIX;
 
-const uploadToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('trophyId', trophyId);
-    formData.append('fileName', fileName);
-    if (trophyName) {
-        formData.append('trophyName', trophyName);
-    }
-
-    const response = await fetch('/api/upload/s3', {
-        method: 'POST',
-        body: formData,
-    });
-
-    if (!response.ok) {
-        throw new Error('Upload failed');
-    }
-
-    const result = await response.json();
-    return result.url;
-};
-
 
 export default function TrophyPage() {
     const router = useRouter();
@@ -54,6 +32,7 @@ export default function TrophyPage() {
     const [slides, setSlides] = useState<{ src: string; width: number; height: number }[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<string>('');
     const [lightboxIsOpen, setLightboxIsOpen] = useState(false);
     const [index, setIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,6 +42,102 @@ export default function TrophyPage() {
     const [codeVerified, setCodeVerified] = useState<string | boolean>('');
     const [canEdit, setCanEdit] = useState(false);
     const [memoryMountName, setMemoryMountName] = useState<string | null>(null);
+
+    const uploadToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
+        const fileSizeLimit = 4 * 1024 * 1024; // 4MB - Vercel function payload limit
+        
+        if (file.size > fileSizeLimit) {
+            // Use presigned URL for large files
+            return uploadLargeFileToS3(file, trophyId, fileName, trophyName);
+        } else {
+            // Use direct upload for small files
+            return uploadSmallFileToS3(file, trophyId, fileName, trophyName);
+        }
+    };
+
+    const uploadLargeFileToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
+        try {
+            setUploadProgress('Getting upload URL...');
+            
+            // Step 1: Get presigned URL
+            const presignedResponse = await fetch('/api/upload/s3-presigned', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fileName,
+                    fileType: file.type,
+                    trophyId,
+                }),
+            });
+
+            if (!presignedResponse.ok) {
+                throw new Error('Failed to get presigned URL');
+            }
+
+            const { presignedUrl, fileUrl } = await presignedResponse.json();
+
+            setUploadProgress('Uploading to cloud storage...');
+            
+            // Step 2: Upload directly to S3 using presigned URL
+            const uploadResponse = await fetch(presignedUrl, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                    'Content-Type': file.type,
+                },
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Failed to upload file to S3');
+            }
+
+            // Step 3: Complete upload and update memory code name
+            if (trophyName) {
+                setUploadProgress('Finalizing upload...');
+                await fetch('/api/upload/s3-complete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        trophyId,
+                        trophyName,
+                    }),
+                });
+            }
+
+            setUploadProgress('');
+            return fileUrl;
+        } catch (error) {
+            setUploadProgress('');
+            console.error('Large file upload error:', error);
+            throw error;
+        }
+    };
+
+    const uploadSmallFileToS3 = async (file: File, trophyId: string, fileName: string, trophyName?: string) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('trophyId', trophyId);
+        formData.append('fileName', fileName);
+        if (trophyName) {
+            formData.append('trophyName', trophyName);
+        }
+
+        const response = await fetch('/api/upload/s3', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error('Upload failed');
+        }
+
+        const result = await response.json();
+        return result.url;
+    };
 
     const openModal = (size: 'sm' | 'md' | 'lg' | 'xl') => {
         setSelectedSize(size);
@@ -352,7 +427,7 @@ export default function TrophyPage() {
                             <h2 className="text-xl font-semibold text-white mb-4">
                                 Select a Trophy Video
                             </h2>
-                            {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
+                            {isUploading && <LoadingSpinner isFullScreen={true} message={uploadProgress || "Uploading"} />}
                             <form className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -430,7 +505,7 @@ export default function TrophyPage() {
                             <h2 className="text-xl font-semibold text-white mb-4">
                                 Select Memory Mount Images
                             </h2>
-                            {isUploading && <LoadingSpinner isFullScreen={true} message="Uploading" />}
+                            {isUploading && <LoadingSpinner isFullScreen={true} message={uploadProgress || "Uploading"} />}
                             <form className="space-y-4">
                                 {imageError && (
                                     <div className="text-red-400 text-sm">{imageErrorMessage}</div>

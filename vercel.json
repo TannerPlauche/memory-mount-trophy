@@ -1,0 +1,15 @@
+{
+  "functions": {
+    "src/app/api/upload/s3/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/upload/s3-presigned/route.ts": {
+      "maxDuration": 10
+    },
+    "src/app/api/upload/s3-complete/route.ts": {
+      "maxDuration": 10
+    }
+  },
+  "regions": ["iad1"],
+  "framework": "nextjs"
+}
