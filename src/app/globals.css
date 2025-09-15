@@ -1,21 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Memory Mount Brand Colors */
+  --mm-brown-dark: #2d1810;
+  --mm-brown-medium: #3d2317;
+  --mm-brown-light: #5c3a26;
+  --mm-green-dark: #1a2f1a;
+  --mm-green-medium: #2d4a2d;
+  --mm-green-light: #456345;
+  --mm-orange-accent: #b8712e;
+  --mm-cream: #f5f1e8;
+  --mm-gray-warm: #8b7355;
+  
+  --background: var(--mm-cream);
+  --foreground: var(--mm-brown-dark);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--mm-brown-dark);
+    --foreground: var(--mm-cream);
   }
 }
 
@@ -26,11 +30,15 @@ body {
 }
 
 .szh-menu-container .szh-menu {
-  background-color: #697282;
-  color: black;
+  background-color: var(--mm-brown-medium);
+  color: var(--mm-cream);
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.szh-menu-container .szh-menu:hover {
+  width: 100%;
 }
 
 .szh-menu-container .szh-menu:hover {

@@ -54,21 +54,22 @@ export default function CodeCheck({ }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-start justify-center py-10 px-4 md:px-10 text-gray-100">
-            <div className="max-w-md w-full bg-gradient-to-br from-blue-900 via-gray-900 to-black shadow-lg rounded-lg p-8 space-y-6">
-                <header className="border-b border-gray-700 pb-4 mb-4">
-                    <h1 className="text-2xl font-bold text-white">Register Your Memory Mount</h1>
-                    <p className="text-gray-400 text-sm mt-1">Enter your verification code to register this Memory Mount</p>
+        <div className="min-h-screen flex items-start justify-center py-10 px-4 md:px-10 text-amber-100" style={{backgroundColor: '#2d1810'}}>
+            <div className="max-w-md w-full shadow-lg rounded-lg p-8 space-y-6" style={{background: 'linear-gradient(to bottom right, #3d2317, #2d1810, #1a0f08)'}}>
+                <header className="border-b border-amber-800 pb-4 mb-4">
+                    <h1 className="text-2xl font-bold text-amber-200">Register Your Memory Mount</h1>
+                    <p className="text-amber-300 text-sm mt-1">Enter your verification code to register this Memory Mount</p>
                 </header>
                 {error && <div className="text-red-400 text-sm">{error}</div>}
                 <form className="space-y-4" onSubmit={checkCode}>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Code</label>
+                        <label className="block text-sm font-medium text-amber-300 mb-1">Code</label>
                         <input
                             type="text"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
-                            className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full text-amber-100 border border-amber-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            style={{backgroundColor: '#3d2317'}}
                             placeholder="ABC123"
                             required
                         />
@@ -76,13 +77,13 @@ export default function CodeCheck({ }) {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors font-semibold"
+                        className="w-full bg-orange-600 text-amber-100 px-4 py-2 rounded hover:bg-orange-700 transition-colors font-semibold"
                         disabled={isLoading}
                     >
                         {isLoading ? "claiming code..." : "Claim Code"}
                     </button>
                     <div className="mt-5">
-                        Already claimed this Memory Mount? <a onClick={() => router.push(`/login?redirect=${encodeURIComponent(redirect)}&trophyId=${encodeURIComponent(trophyId)}`)} className="text-blue-500 hover:underline">Log in</a>
+                        Already claimed this Memory Mount? <a onClick={() => router.push(`/login?redirect=${encodeURIComponent(redirect)}&trophyId=${encodeURIComponent(trophyId)}`)} className="text-orange-400 hover:text-orange-300 hover:underline">Log in</a>
                     </div>
                 </form>
                 {isLoading && <LoadingSpinner isFullScreen={true} message="Signing in..." />}

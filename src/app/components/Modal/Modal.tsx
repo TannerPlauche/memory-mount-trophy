@@ -76,19 +76,20 @@ const Modal: React.FC<ModalProps> = ({
         ref={modalRef}
         className={`
           relative w-full mx-4 ${sizeClasses[size]} 
-          bg-gray-800 shadow-lg rounded-lg 
+          shadow-lg rounded-lg 
           max-h-[90vh] overflow-hidden
           focus:outline-none
         `}
+        style={{backgroundColor: '#3d2317'}}
         tabIndex={-1}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <header className="border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+          <header className="border-b px-6 py-4 flex items-center justify-between" style={{borderColor: '#8b7355'}}>
             {title && (
               <h2 
                 id="modal-title" 
-                className="text-xl font-semibold text-white"
+                className="text-xl font-semibold text-amber-200"
               >
                 {title}
               </h2>
@@ -96,7 +97,7 @@ const Modal: React.FC<ModalProps> = ({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-white transition-colors p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-amber-400 hover:text-amber-200 transition-colors p-1 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
                 aria-label="Close modal"
               >
                 <svg
@@ -119,7 +120,7 @@ const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)] text-gray-100">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)] text-amber-100">
           {children}
         </div>
       </div>
