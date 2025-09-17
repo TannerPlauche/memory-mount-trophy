@@ -10,6 +10,8 @@ export interface IUser extends Document {
     isVerified: boolean;
     createdAt: Date;
     updatedAt: Date;
+    deleted?: Date;  // Soft delete timestamp
+    admin?: boolean;  // Added admin property
 
     // Instance methods
     comparePassword(candidatePassword: string): Promise<boolean>;
@@ -58,6 +60,10 @@ const UserSchema = new Schema<IUser>(
         isVerified: {
             type: Boolean,
             default: false
+        },
+        deleted: {
+            type: Date,
+            default: null
         }
     },
     {
@@ -95,7 +101,7 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
 
 // Static method to find user by email
 UserSchema.statics.findByEmail = function (email: string) {
-    return this.findOne({ email: email.toLowerCase() });
+    return this.findOne({ email: email.toLowerCase(), deleted: null });
 };
 
 // Static method to create user with hashed password

@@ -362,6 +362,11 @@ export default function AccountPage() {
                                                 }`}>
                                                 {userData?.admin ? 'Admin' : userData?.role}
                                             </span>
+                                            {userData?.admin && (
+                                                <div className='mt-2'>
+                                                    <a className='text-blue-400 hover:underline' href="/admin">Go to Admin Panel</a>
+                                                </div>
+                                                )}
                                         </div>
                                     </div>
                                     <div className="space-y-4">

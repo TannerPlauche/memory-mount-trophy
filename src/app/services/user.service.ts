@@ -63,7 +63,7 @@ export class UserService {
    */
   static async getUserById(userId: string): Promise<IUser | null> {
     await dbConnect();
-    return User.findById(userId);
+    return User.findOne({ _id: userId, deleted: null });
   }
 
   /**
@@ -82,10 +82,10 @@ export class UserService {
     
     // Remove sensitive fields from update
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...safeUpdateData } = updateData;
+    const { password, deleted, ...safeUpdateData } = updateData;
     
-    return User.findByIdAndUpdate(
-      userId,
+    return User.findOneAndUpdate(
+      { _id: userId, deleted: null },
       safeUpdateData,
       { new: true, runValidators: true }
     );
@@ -97,8 +97,8 @@ export class UserService {
   static async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
     await dbConnect();
     
-    // Find user by ID
-    const user = await User.findById(userId);
+    // Find user by ID (exclude deleted users)
+    const user = await User.findOne({ _id: userId, deleted: null });
     if (!user) {
       throw new Error('User not found');
     }
@@ -124,13 +124,55 @@ export class UserService {
   }
 
   /**
-   * Delete user
+   * Soft delete user by setting deleted timestamp
    */
   static async deleteUser(userId: string): Promise<boolean> {
     await dbConnect();
     
-    const result = await User.findByIdAndDelete(userId);
+    const result = await User.findByIdAndUpdate(
+      userId,
+      { deleted: new Date() },
+      { new: true }
+    );
     return !!result;
+  }
+
+  /**
+   * Restore deleted user
+   */
+  static async restoreUser(userId: string): Promise<boolean> {
+    await dbConnect();
+    
+    const result = await User.findByIdAndUpdate(
+      userId,
+      { $unset: { deleted: 1 } },
+      { new: true }
+    );
+    return !!result;
+  }
+
+  /**
+   * Get deleted users (admin only)
+   */
+  static async getDeletedUsers(page: number = 1, limit: number = 10): Promise<{
+    users: IUser[];
+    total: number;
+    pages: number;
+  }> {
+    await dbConnect();
+    
+    const skip = (page - 1) * limit;
+    
+    const [users, total] = await Promise.all([
+      User.find({ deleted: { $ne: null } }).skip(skip).limit(limit).sort({ deleted: -1 }),
+      User.countDocuments({ deleted: { $ne: null } })
+    ]);
+
+    return {
+      users,
+      total,
+      pages: Math.ceil(total / limit)
+    };
   }
 
   /**
@@ -146,8 +188,8 @@ export class UserService {
     const skip = (page - 1) * limit;
     
     const [users, total] = await Promise.all([
-      User.find({}).skip(skip).limit(limit).sort({ createdAt: -1 }),
-      User.countDocuments({})
+      User.find({ deleted: null }).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      User.countDocuments({ deleted: null })
     ]);
 
     return {
