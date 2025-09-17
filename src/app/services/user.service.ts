@@ -92,6 +92,38 @@ export class UserService {
   }
 
   /**
+   * Change user password
+   */
+  static async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    await dbConnect();
+    
+    // Find user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+    if (!isCurrentPasswordValid) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Validate new password length
+    if (newPassword.length < 6) {
+      throw new Error('New password must be at least 6 characters long');
+    }
+
+    // Hash new password
+    const { JWTService } = await import('@/app/services/jwt.service');
+    const hashedNewPassword = await JWTService.hashPassword(newPassword);
+
+    // Update password
+    user.password = hashedNewPassword;
+    await user.save();
+  }
+
+  /**
    * Delete user
    */
   static async deleteUser(userId: string): Promise<boolean> {
