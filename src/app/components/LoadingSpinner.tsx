@@ -10,12 +10,12 @@ interface LoadingSpinnerProps {
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ isFullScreen = false, message = "Loading" }) => {
   const spinnerContent = (
     <>
-      <h2 className="pb-10 text-xl text-amber-100">{message}</h2>
+      <h2 className="pb-10 text-xl">{message}</h2>
       <Oval
         visible={true}
         height="180"
         width="180"
-        color="#b8712e"
+        color="#4fa94d"
         ariaLabel="oval-loading"
         wrapperStyle={{}}
         wrapperClass=""
@@ -26,7 +26,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ isFullScreen = false, m
   if (isFullScreen) {
     return (
       <div className="flex flex-col items-center align-center justify-baseline min-h-screen fixed top-10 left-0 right-0">
-        <div className="p-10 rounded-lg shadow-lg text-center text-amber-100" style={{backgroundColor: '#3d2317'}}>
+        <div className="bg-gray-600 p-10 rounded-lg shadow-lg text-center">
           {spinnerContent}
         </div>
       </div>
@@ -34,12 +34,12 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ isFullScreen = false, m
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen" style={{backgroundColor: '#2d1810'}}>
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
       <Oval
         visible={true}
         height="80"
         width="80"
-        color="#b8712e"
+        color="#4fa94d"
         ariaLabel="oval-loading"
         wrapperStyle={{}}
         wrapperClass=""

@@ -76,11 +76,10 @@ const Modal: React.FC<ModalProps> = ({
         ref={modalRef}
         className={`
           relative w-full mx-4 ${sizeClasses[size]} 
-          shadow-lg rounded-lg 
+          bg-gray-800 shadow-lg rounded-lg 
           max-h-[90vh] overflow-hidden
           focus:outline-none
         `}
-        style={{backgroundColor: '#3d2317'}}
         tabIndex={-1}
       >
         {/* Header */}

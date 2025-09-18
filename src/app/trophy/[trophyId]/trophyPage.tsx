@@ -420,15 +420,15 @@ export default function TrophyPage() {
     }
 
     return !isLoading ? (
-        <div className="min-h-screen bg-amber-50 py-10 px-4 md:px-10 text-amber-900" style={{backgroundColor: '#2d1810'}}>
-            <div className="max-w-3xl mx-auto bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 shadow-lg rounded-lg p-6 space-y-6" style={{background: 'linear-gradient(to bottom right, #3d2317, #5c3a26, #2d1810)'}}>
-                <header className="border-b border-amber-700 pb-4 flex justify-between">
+        <div className="min-h-screen bg-gray-900 py-10 px-4 md:px-10 text-gray-100">
+            <div className="max-w-3xl mx-auto bg-gradient-to-br from-blue-900 via-gray-900 to-black shadow-lg rounded-lg p-6 space-y-6">
+                <header className="border-b border-gray-700 pb-4 flex justify-between">
                     <div>
-                        <p className="text-amber-300 text-sm mt-1">
-                            Trophy ID: <span className="font-mono text-orange-400">{trophyId}</span>
+                        <p className="text-gray-400 text-sm mt-1">
+                            Trophy ID: <span className="font-mono text-blue-400">{trophyId}</span>
                         </p>
                         {memoryMountName && (
-                            <p className="text-amber-100 text-lg font-semibold mt-2">
+                            <p className="text-gray-300 text-lg font-semibold mt-2">
                                 {memoryMountName}
                             </p>
                         )}
@@ -436,20 +436,20 @@ export default function TrophyPage() {
                 </header>
                 {
                     fileError && (
-                        <div className="text-red-300 text-sm">{fileErrorMessage}</div>
+                        <div className="text-red-400 text-sm">{fileErrorMessage}</div>
                     )
                 }
 
                 {
                     canEdit && !videoFile ? (
                         <section>
-                            <h2 className="text-xl font-semibold text-amber-100 mb-4">
+                            <h2 className="text-xl font-semibold text-white mb-4">
                                 Select a Trophy Video
                             </h2>
                             {isUploading && <LoadingSpinner isFullScreen={true} message={uploadProgress || "Uploading"} />}
                             <form className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-amber-200 mb-1">
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
                                         Trophy Name
                                     </label>
                                     <input
@@ -458,11 +458,11 @@ export default function TrophyPage() {
                                         type="text"
                                         name="fileName"
                                         placeholder="e.g., Elk Hunt 2024"
-                                        className="w-full bg-amber-900 text-amber-100 border border-amber-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-amber-200 mb-1">
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
                                         Upload Video
                                     </label>
                                     <input
@@ -472,7 +472,7 @@ export default function TrophyPage() {
                                         name="file"
                                         accept="video/*"
                                         onChange={checkFileSize}
-                                        className="w-full bg-amber-900 text-amber-100 border border-amber-700 rounded px-3 py-2"
+                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
                                     />
                                 </div>
                             </form>
@@ -480,7 +480,7 @@ export default function TrophyPage() {
                                 <button
                                     type="button"
                                     onClick={uploadFiles}
-                                    className="my-4 bg-orange-600 text-amber-100 px-4 py-2 rounded hover:bg-orange-700"
+                                    className="my-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                 >
                                     Submit
                                 </button>
@@ -490,7 +490,7 @@ export default function TrophyPage() {
                 }
                 {!!videoFile && (
                     <section>
-                        <h2 className="text-xl font-semibold text-amber-100 mb-4">
+                        <h2 className="text-xl font-semibold text-white mb-4">
                             {memoryMountName ? `${memoryMountName} Video` : 'Memory Mount Video'}
                         </h2>
                         {/* <ul className="mb-4 space-y-2">
@@ -505,7 +505,7 @@ export default function TrophyPage() {
                                     </a>
                                 </li>
                             </ul> */}
-                        <div className="rounded overflow-hidden border border-amber-700 shadow-sm">
+                        <div className="rounded overflow-hidden border border-gray-700 shadow-sm">
                             <video
                                 src={videoFile ? videoFile.downloadUrl : ''}
                                 controls
@@ -521,16 +521,16 @@ export default function TrophyPage() {
                 {
                     canEdit && !imageFiles.length ? (
                         <section>
-                            <h2 className="text-xl font-semibold text-amber-100 mb-4">
+                            <h2 className="text-xl font-semibold text-white mb-4">
                                 Select Memory Mount Images
                             </h2>
                             {isUploading && <LoadingSpinner isFullScreen={true} message={uploadProgress || "Uploading"} />}
                             <form className="space-y-4">
                                 {imageError && (
-                                    <div className="text-red-300 text-sm">{imageErrorMessage}</div>
+                                    <div className="text-red-400 text-sm">{imageErrorMessage}</div>
                                 )}
                                 <div>
-                                    <label className="block text-sm font-medium text-amber-200 mb-1">
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
                                         Upload Images
                                     </label>
                                     <input
@@ -541,13 +541,13 @@ export default function TrophyPage() {
                                         accept={imageFileTypes.join(',')}
                                         multiple
                                         onChange={checkImagesFileSize}
-                                        className="w-full bg-amber-900 text-amber-100 border border-amber-700 rounded px-3 py-2"
+                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
                                     />
                                 </div>
                                 <button
                                     type="button"
                                     onClick={uploadFiles}
-                                    className="bg-orange-600 text-amber-100 px-4 py-2 rounded hover:bg-orange-700"
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                                 >
                                     Submit
                                 </button>
@@ -557,7 +557,7 @@ export default function TrophyPage() {
                 }
                 {!!imageFiles.length && (
                     <section>
-                        <h2 className="text-xl font-semibold text-amber-100 mb-4">
+                        <h2 className="text-xl font-semibold text-white mb-4">
                             {memoryMountName ? `${memoryMountName} Images` : 'Memory Mount Images'}
                         </h2>
                         <Lightbox
@@ -605,7 +605,7 @@ export default function TrophyPage() {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-30 mt-10 mb-10">
                                     {imageFiles.map((imageFile) => (
                                         <div key={imageFile.name} className="flex flex-col space-y-2">
-                                            <span className="text-sm text-amber-200 truncate">{imageFile.name}</span>
+                                            <span className="text-sm text-gray-300 truncate">{imageFile.name}</span>
                                             <div className="relative inline-block w-32 h-32">
                                                 <Image src={imageFile.downloadUrl} alt={imageFile.name} width={128} height={128} className="w-32 h-32 object-cover rounded" />
                                                 <button
@@ -623,13 +623,13 @@ export default function TrophyPage() {
                             <div className="flex space-x-3">
                                 <button
                                     onClick={closeModal}
-                                    className="bg-amber-700 text-amber-100 px-4 py-2 rounded hover:bg-amber-800 transition-colors"
+                                    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={closeModal}
-                                    className="bg-orange-600 text-amber-100 px-4 py-2 rounded hover:bg-orange-700 transition-colors"
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
                                 >
                                     Save Changes
                                 </button>
@@ -641,13 +641,13 @@ export default function TrophyPage() {
                 )
                 }
                 {/* Move menu items down here */}
-                {canEdit && <hr className="border-amber-700 p-0 m-0" />}
-                <h3 className='text-lg font-semibold p-2 m-0 text-center text-amber-100'>Owner Tools</h3>
-                {/* {canEdit && <hr className="border-amber-700 p-0 m-0" />} */}
+                {canEdit && <hr className="border-gray-700 p-0 m-0" />}
+                <h3 className='text-lg font-semibold p-2 m-0 text-center'>Owner Tools</h3>
+                {/* {canEdit && <hr className="border-gray-700 p-0 m-0" />} */}
                 <div className="mt-3 flex flex-col flex-wrap gap-4 justify-center">
                     {canEdit && !!videoFile && (
                         <button
-                            className="bg-amber-800 font-semibold hover:bg-amber-900 text-amber-100 px-4 py-2 rounded transition-colors text-sm"
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
                             onClick={replaceVideo}
                         >
                             Replace Video
@@ -655,7 +655,7 @@ export default function TrophyPage() {
                     )}
                     {canEdit && !!imageFiles.length && (
                         <button
-                            className="bg-amber-800 font-semibold hover:bg-amber-900 text-amber-100 px-4 py-2 rounded transition-colors text-sm"
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
                             onClick={openEditImagesModal}
                         >
                             Edit Images
@@ -663,7 +663,7 @@ export default function TrophyPage() {
                     )}
                     {canEdit && !!imageFiles.length && (
                         <button
-                            className="bg-amber-800 font-semibold hover:bg-amber-900 text-amber-100 px-4 py-2 rounded transition-colors text-sm"
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
                             onClick={showImageUpload}
                         >
                             Add Images
@@ -671,7 +671,7 @@ export default function TrophyPage() {
                     )}
                     {!!userToken && (
                         <button
-                            className="bg-amber-800 font-semibold hover:bg-amber-900 text-amber-100 px-4 py-2 rounded transition-colors text-sm"
+                            className="bg-blue-900 font-semibold hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors text-sm"
                             onClick={() => router.push(`/account?redirect=${urlEncode(window.location.pathname)}`)}
                         >
                             View Account
