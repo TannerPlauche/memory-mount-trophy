@@ -6,7 +6,7 @@ import { MemoryCodeService } from '@/app/services/memory-code-db.service';
 // GET user memory mounts (admin only)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const { userId } = await params;

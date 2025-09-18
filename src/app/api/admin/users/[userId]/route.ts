@@ -5,10 +5,10 @@ import { JWTService } from '@/app/services/jwt.service';
 // PUT - Update user (admin only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
 
     // Get authorization header
     const authHeader = request.headers.get('authorization');
@@ -81,7 +81,7 @@ export async function PUT(
 
   } catch (error) {
     console.error('Update user error:', error);
-    
+
     // Handle duplicate email error
     if (error instanceof Error && error.message.includes('duplicate key error')) {
       return NextResponse.json(
@@ -100,10 +100,10 @@ export async function PUT(
 // DELETE - Delete user (admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = params;
+    const { userId } = await params;
 
     // Get authorization header
     const authHeader = request.headers.get('authorization');
