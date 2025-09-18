@@ -350,7 +350,7 @@ export default function AccountPage() {
                                         <div>
                                             <label className="block text-sm font-medium text-primary-gold">Role</label>
                                             <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${userData?.role === 'admin'
-                                                ? 'bg-purple-900 text-purple-200'
+                                                ? '#C2B7AC'
                                                 : 'bg-primary-neutral text-blue-200'
                                                 }`}>
                                                 {userData?.admin ? 'Admin' : userData?.role}
