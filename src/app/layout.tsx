@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <div className="bg-gray-500 flex items-center justify-center py-1">
+        <div className="bg-orange-400 flex items-center justify-center py-1">
           <a href="https://memorymount.com" target="_blank" rel="noopener noreferrer">
             <Image src={logo} alt="Logo" height={100} />
           </a>
