@@ -76,7 +76,7 @@ const Modal: React.FC<ModalProps> = ({
         ref={modalRef}
         className={`
           relative w-full mx-4 ${sizeClasses[size]} 
-          bg-gray-800 shadow-lg rounded-lg 
+          bg-primary-dark shadow-lg rounded-lg 
           max-h-[90vh] overflow-hidden
           focus:outline-none
         `}
@@ -88,7 +88,7 @@ const Modal: React.FC<ModalProps> = ({
             {title && (
               <h2 
                 id="modal-title" 
-                className="text-xl font-semibold text-white"
+                className="text-xl font-semibold text-primary-dark"
               >
                 {title}
               </h2>
@@ -96,7 +96,7 @@ const Modal: React.FC<ModalProps> = ({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-white transition-colors p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-primary-gold hover:text-primary-dark transition-colors p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="Close modal"
               >
                 <svg

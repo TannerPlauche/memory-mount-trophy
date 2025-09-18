@@ -101,7 +101,7 @@ describe('file.service', () => {
         });
 
         // I changed this but don't want to fix this test properly. 
-        it('should return error when trophy ID is missing', async () => {
+        it('should return error when Memory Mount Id is missing', async () => {
             const result = await getFiles('');
 
             expect(result).toEqual([]);

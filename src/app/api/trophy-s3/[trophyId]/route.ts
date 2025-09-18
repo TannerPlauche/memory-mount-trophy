@@ -24,7 +24,7 @@ export async function GET(
         
         if (!trophyId) {
             return NextResponse.json(
-                { error: 'Trophy ID is required' },
+                { error: 'Memory Mount Id is required' },
                 { status: 400 }
             );
         }

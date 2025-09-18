@@ -49,12 +49,12 @@ function MyComponent() {
 >
   <form className="space-y-4">
     <div>
-      <label className="block text-sm font-medium text-gray-300 mb-1">
+      <label className="block text-sm font-medium text-primary-gold mb-1">
         Trophy Name
       </label>
       <input
         type="text"
-        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full bg-primary-light text-primary-dark border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Enter trophy name..."
       />
     </div>
@@ -63,13 +63,13 @@ function MyComponent() {
       <button
         type="button"
         onClick={() => setIsModalOpen(false)}
-        className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+        className="bg-gray-600 text-primary-dark px-4 py-2 rounded hover:bg-primary-light"
       >
         Cancel
       </button>
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="bg-primary-neutral text-primary-dark px-4 py-2 rounded hover:bg-primary-gold"
       >
         Save
       </button>
@@ -99,12 +99,12 @@ function MyComponent() {
 ## Styling
 
 The modal uses the same design language as TrophyPage:
-- Background: `bg-gray-800`
+- Background: `bg-primary-dark`
 - Border: `border-gray-700`
 - Text: `text-gray-100`
-- Inputs: `bg-gray-700` with `border-gray-600`
+- Inputs: `bg-primary-light` with `border-gray-600`
 - Focus: `focus:ring-blue-500`
-- Buttons: Blue (`bg-blue-600`) and Gray (`bg-gray-600`) variants
+- Buttons: Blue (`bg-primary-neutral`) and Gray (`bg-gray-600`) variants
 
 ## Accessibility
 

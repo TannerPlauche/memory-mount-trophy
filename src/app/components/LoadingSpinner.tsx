@@ -15,7 +15,8 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ isFullScreen = false, m
         visible={true}
         height="180"
         width="180"
-        color="#4fa94d"
+        color="#D4A574"
+        secondaryColor="#2B2C2D"
         ariaLabel="oval-loading"
         wrapperStyle={{}}
         wrapperClass=""
@@ -34,12 +35,13 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ isFullScreen = false, m
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-darker">
       <Oval
         visible={true}
         height="80"
         width="80"
-        color="#4fa94d"
+        color="#D4A574"
+        secondaryColor="#2B2C2D"
         ariaLabel="oval-loading"
         wrapperStyle={{}}
         wrapperClass=""

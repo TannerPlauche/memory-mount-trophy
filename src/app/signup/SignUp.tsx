@@ -55,57 +55,57 @@ export default function SignUpPage({ }) {
 
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-start justify-center py-10 px-4 md:px-10 text-gray-100">
-            <div className="max-w-md w-full bg-gray-800 shadow-lg rounded-lg p-8 space-y-6">
+        <div className="min-h-screen bg-darker flex items-start justify-center py-10 px-4 md:px-10 text-gray-100">
+            <div className="max-w-md w-full bg-primary-dark shadow-lg rounded-lg p-8 space-y-6">
                 <header className="border-b border-gray-700 pb-4 mb-4">
-                    <h1 className="text-2xl font-bold text-white">Sign Up</h1>
-                    <p className="text-gray-400 text-sm mt-1">Sign up to claim your Memory Mount account</p>
+                    <h1 className="text-2xl font-bold text-neutral">Sign Up</h1>
+                    <p className="text-primary-gold text-sm mt-1">Sign up to claim your Memory Mount account</p>
                 </header>
                 {error && <div className="text-red-400 text-sm">{error}</div>}
                 <form className="space-y-4" onSubmit={handleSignUp}>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <label className="block text-sm font-medium text-primary-gold mb-1">Email</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-primary-light text-primary-dark border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="demo@trophy.com"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-primary-gold mb-1">Password</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-primary-light text-primary-dark border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="password"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Confirm Password</label>
+                        <label className="block text-sm font-medium text-primary-gold mb-1">Confirm Password</label>
                         <input
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full bg-primary-light text-primary-dark border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="password"
                             required
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors font-semibold"
+                        className="w-full bg-primary-neutral text-primary-dark px-4 py-2 rounded hover:bg-primary-gold transition-colors font-semibold"
                         disabled={isLoading}
                     >
                         {isLoading ? "Signing in..." : "Sign In"}
                     </button>
                 </form>
                 <div>
-                    <p>Already have an account? <a onClick={() => router.push(`/login?redirect=${redirect}&trophyId=${trophyId}`)} className="text-blue-500 hover:underline">Sign in</a></p>
+                    <p className="text-primary-light">Already have an account? <a onClick={() => router.push(`/login?redirect=${redirect}&trophyId=${trophyId}`)} className="text-primary-gold hover:underline">Sign in</a></p>
                 </div>
                 {isLoading && <LoadingSpinner isFullScreen={true} message="Signing in..." />}
             </div>
