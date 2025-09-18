@@ -222,10 +222,10 @@ export default function AccountPage() {
     }
 
     return (
-        <div className="min-h-screen py-10 px-4 md:px-10 text-amber-100" style={{backgroundColor: '#2d1810'}}>
+        <div className="min-h-screen py-10 px-4 md:px-10 text-amber-100" style={{ backgroundColor: '#2d1810' }}>
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="shadow-lg rounded-lg p-6 mb-6" style={{backgroundColor: '#3d2317'}}>
+                <div className="shadow-lg rounded-lg p-6 mb-6" style={{ backgroundColor: '#3d2317' }}>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center">
@@ -252,7 +252,7 @@ export default function AccountPage() {
                 </div>
 
                 {/* Navigation Tabs */}
-                <div className="shadow-lg rounded-lg mb-6" style={{backgroundColor: '#3d2317'}}>
+                <div className="shadow-lg rounded-lg mb-6" style={{ backgroundColor: '#3d2317' }}>
                     <div className="flex border-b border-amber-700">
                         {[
                             { id: 'profile', label: 'Profile', icon: User },
@@ -276,7 +276,7 @@ export default function AccountPage() {
                 </div>
 
                 {/* Tab Content */}
-                <div className="shadow-lg rounded-lg p-6" style={{backgroundColor: '#3d2317'}}>
+                <div className="shadow-lg rounded-lg p-6" style={{ backgroundColor: '#3d2317' }}>
                     {error && (
                         <div className="mb-4 p-4 bg-red-900 border border-red-700 rounded-lg text-red-200">
                             {error}
@@ -366,7 +366,7 @@ export default function AccountPage() {
                                                 <div className='mt-2'>
                                                     <a className='text-blue-400 hover:underline' href="/admin">Go to Admin Panel</a>
                                                 </div>
-                                                )}
+                                            )}
                                         </div>
                                     </div>
                                     <div className="space-y-4">
@@ -413,7 +413,7 @@ export default function AccountPage() {
                                         <div
                                             key={trophy.id}
                                             className="border rounded-lg p-4 hover:bg-opacity-80 transition-colors cursor-pointer"
-                                            style={{backgroundColor: '#3d2317', borderColor: '#8b7355'}}
+                                            style={{ backgroundColor: '#3d2317', borderColor: '#8b7355' }}
                                             onClick={() => router.push(`/trophy/${trophy.id}`)}
                                         >
                                             <div className="flex items-start justify-between mb-3">
@@ -472,7 +472,7 @@ export default function AccountPage() {
                                             key={mount.id}
                                             className="border border-amber-700 rounded-lg p-4 cursor-pointer hover:bg-amber-900 transition-colors"
                                             onClick={() => router.push(`/trophy/${mount.id}`)}
-                                            style={{backgroundColor: '#5c3a26'}}
+                                            style={{ backgroundColor: '#5c3a26' }}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div>
@@ -500,18 +500,17 @@ export default function AccountPage() {
                             <h2 className="text-xl font-semibold text-amber-100">Account Settings</h2>
 
                             <div className="space-y-4">
-                                <div className="bg-gray-700 border border-gray-600 rounded-lg p-4">
+                                <div className="border border-amber-700 rounded-lg p-4" style={{ backgroundColor: '#5c3a26' }}>
                                     <h3 className="font-medium text-white mb-2">Password</h3>
                                     <p className="text-gray-400 text-sm mb-3">Change your account password</p>
-                                    <button 
+                                    <button className="bg-amber-700 hover:bg-amber-600 text-amber-100 px-4 py-2 rounded transition-colors"
                                         onClick={() => setShowPasswordModal(true)}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors"
                                     >
                                         Change Password
                                     </button>
                                 </div>
 
-                                <div className="border border-amber-700 rounded-lg p-4" style={{backgroundColor: '#5c3a26'}}>
+                                <div className="border border-amber-700 rounded-lg p-4" style={{ backgroundColor: '#5c3a26' }}>
                                     <h3 className="font-medium text-amber-100 mb-2">Privacy</h3>
                                     <p className="text-amber-300 text-sm mb-3">Manage your privacy settings</p>
                                     <button className="bg-amber-700 hover:bg-amber-600 text-amber-100 px-4 py-2 rounded transition-colors">
