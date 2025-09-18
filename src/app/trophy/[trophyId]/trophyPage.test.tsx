@@ -104,8 +104,8 @@
 //         })
 //     })
 
-//     describe('Trophy ID Display', () => {
-//         it('should display the trophy ID', async () => {
+//     describe('Memory Mount Id Display', () => {
+//         it('should display the Memory Mount Id', async () => {
 //             mockGetFiles.mockResolvedValue([])
 
 //             const { container } = render(<TrophyPage />)
@@ -113,13 +113,13 @@
 //             // Wait for the component to finish loading
 //             await new Promise(resolve => setTimeout(resolve, 100))
 
-//             expect(container.textContent).toContain('Trophy ID: test-trophy-123')
+//             expect(container.textContent).toContain('Memory Mount Id: test-trophy-123')
 //         })
 //     })
 
 //     describe('Error Handling', () => {
 //         it('should display error message when API returns error', async () => {
-//             const errorMessage = 'Trophy ID: test-trophy-123Select a Trophy VideoTrophy NameUpload VideoSelect Trophy ImagesUpload ImagesSubmit';
+//             const errorMessage = 'Memory Mount Id: test-trophy-123Select a Trophy VideoTrophy NameUpload VideoSelect Trophy ImagesUpload ImagesSubmit';
 //             mockGetFiles.mockResolvedValue({ error: errorMessage })
 
 //             const { container } = render(<TrophyPage />)
@@ -201,7 +201,7 @@
 //     })
 
 //     describe('API Calls', () => {
-//         it('should make API call with correct trophy ID', async () => {
+//         it('should make API call with correct Memory Mount Id', async () => {
 //             mockGetFiles.mockResolvedValue([])
 
 //             render(<TrophyPage />)

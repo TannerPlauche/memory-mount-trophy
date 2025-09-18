@@ -27,37 +27,37 @@ const AdminPage = () => {
 
 
     return isAdmin ? (
-        <div className="min-h-screen bg-gray-900 text-white p-10">
-            <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
+        <div className="min-h-screen bg-darker text-primary-dark p-10">
+            <h1 className="text-4xl text-neutral font-bold mb-8">Admin Dashboard</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Link href="/admin/users" className="bg-gray-800 p-6 rounded-lg shadow hover:bg-gray-700 transition">
+                <Link href="/admin/users" className="bg-primary-dark p-6 rounded-lg shadow hover:bg-primary-light transition">
                     <div className="flex items-center">
                         <UserGroupIcon className="h-8 w-8 mr-4 text-green-400" />
                         <div>
                             <h2 className="text-xl font-semibold">Manage Users  </h2>
-                            <p className="mt-2 text-gray-400">View and manage user accounts</p>
+                            <p className="mt-2 text-primary-gold">View and manage user accounts</p>
                         </div>
                     </div>
                 </Link>
-                <Link href="/admin/get-code" className="bg-gray-800 p-6 rounded-lg shadow hover:bg-gray-700 transition">
+                <Link href="/admin/get-code" className="bg-primary-dark p-6 rounded-lg shadow hover:bg-primary-light transition">
                     <div className="flex items-center">
-                        <CodeBracketIcon className="h-8 w-8 mr-4 text-blue-400" />
+                        <CodeBracketIcon className="h-8 w-8 mr-4 text-neutral" />
                         <div>
                             <h2 className="text-xl font-semibold">Memory Codes</h2>
-                            <p className="mt-2 text-gray-400">Generate and manage memory codes</p>
+                            <p className="mt-2 text-primary-gold">Generate and manage memory codes</p>
                         </div>
                     </div>
                 </Link>
-                <Link href="/admin/reports" className="bg-gray-800 p-6 rounded-lg shadow hover:bg-gray-700 transition">
+                <Link href="/admin/reports" className="bg-primary-dark p-6 rounded-lg shadow hover:bg-primary-light transition">
                     <div className="flex items-center">
                         <DocumentTextIcon className="h-8 w-8 mr-4 text-yellow-400" />
                         <div>
                             <h2 className="text-xl font-semibold">Reports</h2>
-                            <p className="mt-2 text-gray-400">View system reports and analytics</p>
+                            <p className="mt-2 text-primary-gold">View system reports and analytics</p>
                         </div>
                     </div>
                 </Link>
-                <Link href="/api/auth/logout" className="bg-red-600 p-6 rounded-lg shadow hover:bg-red-700 transition">
+                <Link href="/api/auth/logout" className="bg-red-600 p-6 rounded-lg shadow hover:bg-red-700 text-white transition">
                     <div className="flex items-center">
                         <ArrowRightOnRectangleIcon className="h-8 w-8 mr-4 text-white" />
                         <div>

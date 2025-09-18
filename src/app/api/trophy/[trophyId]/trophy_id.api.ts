@@ -13,7 +13,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ trophyId
     console.log('getting files for: ', trophyId);
     if (!trophyId || typeof trophyId !== 'string') {
         console.error("Invalid trophyId:", trophyId);
-        return new Response(JSON.stringify({ error: "Trophy ID is required" }), {
+        return new Response(JSON.stringify({ error: "Memory Mount Id is required" }), {
             status: 400,
         });
     }

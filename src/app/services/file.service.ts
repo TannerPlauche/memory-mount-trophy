@@ -33,7 +33,7 @@ export async function createFile(trophyId: string, fileName: string, file: ReadS
 export const getFiles = async (trophyId: string): Promise<iTrophyFile[]> => {
     try {
         if (!trophyId) {
-            throw new Error('Trophy ID is required');
+            throw new Error('Memory Mount Id is required');
         }
 
         // Use S3-based API instead of Vercel Blob
@@ -48,7 +48,7 @@ export const getFiles = async (trophyId: string): Promise<iTrophyFile[]> => {
 export const deleteFile = async (trophyId: string, file: iTrophyFile): Promise<{ success: boolean; error?: string }> => {
     try {
         if (!trophyId || !file) {
-            throw new Error('Trophy ID and file are required');
+            throw new Error('Memory Mount Id and file are required');
         }
 
         if (!file.pathname) {

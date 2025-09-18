@@ -1,21 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Memory Mount Brand Colors */
+  --mm-brown-dark: #2d1810;
+  --mm-brown-medium: #3d2317;
+  --mm-brown-light: #5c3a26;
+  --mm-green-dark: #1a2f1a;
+  --mm-green-medium: #2d4a2d;
+  --mm-green-light: #456345;
+  --mm-orange-accent: #b8712e;
+  --mm-cream: #f5f1e8;
+  --mm-gray-warm: #8b7355;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --background: var(--mm-cream);
+  --foreground: var(--mm-brown-dark);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--mm-brown-dark);
+    --foreground: var(--mm-cream);
   }
 }
 
@@ -26,8 +30,8 @@ body {
 }
 
 .szh-menu-container .szh-menu {
-  background-color: #697282;
-  color: black;
+  background-color: var(--mm-brown-medium);
+  color: var(--mm-cream);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,4 +39,70 @@ body {
 
 .szh-menu-container .szh-menu:hover {
   width: 100%;
+}
+
+
+.bg-primary-light {
+  background-color: #F4F4F4;
+  color: #4A4B4C;
+}
+
+.text-primary-light {
+  color: #F4F4F4;
+}
+
+.bg-primary-dark {
+  /* background-color: #2B2C2D; */
+  background-color: #4A4B4C;
+}
+
+.text-primary-dark {
+  /* background-color: #2B2C2D; */
+  color: #4A4B4C;
+}
+
+.border-primary-dark {
+  border-color: #4A4B4C;
+}
+
+.bg-primary-neutral {
+  background-color: #C2B7AC;
+  color: #2B2C2D;
+}
+
+.bg-primary-neutral:hover {
+  background-color: #D4A574;
+}
+
+.text-neutral {
+  color: #C2B7AC;
+}
+
+.bg-primary-gold {
+  background-color: #D4A574;
+  color: #4A4B4C;
+}
+
+.text-primary-gold {
+  color: #D4A574;
+}
+
+.border-b-gold {
+  border-color: #D4A574 !important;
+  border-bottom: 1px solid;
+}
+
+.bg-darker {
+  /* background-color: #4A4B4C; */
+  background-color: #2B2C2D;
+}
+
+.text-darker {
+  /* background-color: #4A4B4C; */
+  color: #2B2C2D;
+}
+
+.bg-taupe {
+  background-color: #B5A391;
+  color: #2B2C2D;
 }
