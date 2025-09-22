@@ -29,7 +29,7 @@ interface MemoryMount {
 export default function UsersPage() {
     const router = useRouter();
     const token = useAuthToken(`/login?redirect=${urlEncode('/admin/users')}`);
-    
+
     const [isLoading, setIsLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [users, setUsers] = useState<UserData[]>([]);
@@ -53,7 +53,7 @@ export default function UsersPage() {
                     Authorization: `Bearer ${token}`
                 }
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 setUsers(data.users);
@@ -72,7 +72,7 @@ export default function UsersPage() {
                     Authorization: `Bearer ${token}`
                 }
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 if (data.user.admin) {
@@ -97,7 +97,7 @@ export default function UsersPage() {
                     Authorization: `Bearer ${token}`
                 }
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 setUserMemoryMounts(data.memoryMounts || []);
@@ -181,7 +181,7 @@ export default function UsersPage() {
 
     const toggleUserRole = async (user: UserData) => {
         const newRole = user.role === 'admin' ? 'user' : 'admin';
-        
+
         try {
             const response = await fetch(`/api/admin/users/${user._id}`, {
                 method: 'PUT',
@@ -270,7 +270,7 @@ export default function UsersPage() {
                     <div className="p-6 border-b border-gray-700">
                         <h2 className="text-xl font-semibold text-white">All Users ({users.length})</h2>
                     </div>
-                    
+
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-700">
@@ -299,20 +299,18 @@ export default function UsersPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                user.role === 'admin' 
-                                                    ? 'bg-purple-900 text-purple-200' 
+                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.role === 'admin'
+                                                    ? 'bg-purple-900 text-purple-200'
                                                     : 'bg-blue-900 text-blue-200'
-                                            }`}>
+                                                }`}>
                                                 {user.role}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                user.isVerified 
-                                                    ? 'bg-green-900 text-green-200' 
+                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.isVerified
+                                                    ? 'bg-green-900 text-green-200'
                                                     : 'bg-yellow-900 text-yellow-200'
-                                            }`}>
+                                                }`}>
                                                 {user.isVerified ? 'Verified' : 'Unverified'}
                                             </span>
                                         </td>
@@ -371,7 +369,7 @@ export default function UsersPage() {
                                 <h3 className="text-lg font-medium text-white border-b border-gray-600 pb-2">
                                     User Information
                                 </h3>
-                                
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">
                                         Name
@@ -417,27 +415,29 @@ export default function UsersPage() {
                                 <h3 className="text-lg font-medium text-white border-b border-gray-600 pb-2">
                                     Memory Mounts ({userMemoryMounts.length})
                                 </h3>
-                                
+
                                 <div className="max-h-80 overflow-y-auto space-y-2">
                                     {userMemoryMounts.length === 0 ? (
                                         <p className="text-gray-400 text-sm">No memory mounts found</p>
                                     ) : (
                                         userMemoryMounts.map((mount) => (
-                                            <div key={mount.id} className="bg-gray-700 rounded-lg p-3 border border-gray-600">
-                                                <div className="flex items-start justify-between">
-                                                    <div>
-                                                        <p className="text-sm font-medium text-white font-mono">
-                                                            {mount.name || mount.id}
-                                                        </p>
-                                                        <p className="text-xs text-gray-400">
-                                                            Code: {mount.code}
-                                                        </p>
-                                                        <p className="text-xs text-gray-400">
-                                                            Used: {formatDate(mount.usedAt)}
-                                                        </p>
+                                            <div key={mount.id} className="cursor-pointer bg-gray-700 rounded-lg p-3 border border-gray-600">
+                                                <a href={`/trophy/${mount.id}`} target="_blank" rel="noopener noreferrer">
+                                                    <div className="flex items-start justify-between">
+                                                        <div>
+                                                            <p className="text-sm font-medium text-white font-mono">
+                                                                {mount.name || mount.id}
+                                                            </p>
+                                                            <p className="text-xs text-gray-400">
+                                                                Code: {mount.code}
+                                                            </p>
+                                                            <p className="text-xs text-gray-400">
+                                                                Used: {formatDate(mount.usedAt)}
+                                                            </p>
+                                                        </div>
+                                                        <Award size={16} className="text-blue-400" />
                                                     </div>
-                                                    <Award size={16} className="text-blue-400" />
-                                                </div>
+                                                </a>
                                             </div>
                                         ))
                                     )}
@@ -480,7 +480,7 @@ export default function UsersPage() {
                         <p className="text-red-400 text-sm">
                             This action cannot be undone and will permanently delete all user data including memory mounts.
                         </p>
-                        
+
                         <div className="flex justify-end space-x-3 pt-4">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
