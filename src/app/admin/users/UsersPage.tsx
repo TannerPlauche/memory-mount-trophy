@@ -33,6 +33,8 @@ export default function UsersPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [users, setUsers] = useState<UserData[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [userMemoryMounts, setUserMemoryMounts] = useState<MemoryMount[]>([]);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -57,12 +59,33 @@ export default function UsersPage() {
             if (response.ok) {
                 const data = await response.json();
                 setUsers(data.users);
+                setFilteredUsers(data.users); // Initialize filtered users
             }
         } catch (error) {
             console.error('Error fetching users:', error);
             setError('Failed to load users');
         }
-    }, [token]);
+    }, []);
+
+    // Filter users based on search term
+    const filterUsers = useCallback((term: string) => {
+        if (!term.trim()) {
+            setFilteredUsers(users);
+        } else {
+            const filtered = users.filter(user => 
+                user.email.toLowerCase().includes(term.toLowerCase()) ||
+                (user.name && user.name.toLowerCase().includes(term.toLowerCase()))
+            );
+            setFilteredUsers(filtered);
+        }
+    }, [users]);
+
+    // Handle search input change
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const term = e.target.value;
+        setSearchTerm(term);
+        filterUsers(term);
+    };
 
     const checkAdminAndLoadUsers = useCallback(async () => {
         try {
@@ -143,7 +166,8 @@ export default function UsersPage() {
             if (response.ok) {
                 setSuccess('User updated successfully');
                 setShowEditModal(false);
-                fetchUsers();
+                await fetchUsers();
+                filterUsers(searchTerm); // Re-apply search filter
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to update user');
@@ -168,7 +192,8 @@ export default function UsersPage() {
             if (response.ok) {
                 setSuccess('User deleted successfully');
                 setShowDeleteModal(false);
-                fetchUsers();
+                await fetchUsers();
+                filterUsers(searchTerm); // Re-apply search filter
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to delete user');
@@ -194,7 +219,8 @@ export default function UsersPage() {
 
             if (response.ok) {
                 setSuccess(`User role changed to ${newRole}`);
-                fetchUsers();
+                await fetchUsers();
+                filterUsers(searchTerm); // Re-apply search filter
             }
         } catch (error) {
             console.error('Error updating user role:', error);
@@ -268,7 +294,27 @@ export default function UsersPage() {
                 {/* Users Table */}
                 <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                     <div className="p-6 border-b border-gray-700">
-                        <h2 className="text-xl font-semibold text-white">All Users ({users.length})</h2>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <h2 className="text-xl font-semibold text-white">
+                                All Users ({filteredUsers.length}{searchTerm && ` of ${users.length}`})
+                            </h2>
+                            
+                            {/* Search Input */}
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search by name or email..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    className="w-full sm:w-80 bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -283,7 +329,23 @@ export default function UsersPage() {
                                 </tr>
                             </thead>
                             <tbody className="bg-gray-800 divide-y divide-gray-700">
-                                {users.map((user) => (
+                                {filteredUsers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-8 text-center">
+                                            <div className="text-gray-400">
+                                                {searchTerm ? (
+                                                    <>
+                                                        <p className="text-lg font-medium">No users found</p>
+                                                        <p className="text-sm mt-1">No users match your search criteria &quot;{searchTerm}&quot;</p>
+                                                    </>
+                                                ) : (
+                                                    <p className="text-lg font-medium">No users available</p>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredUsers.map((user) => (
                                     <tr key={user._id} className="hover:bg-gray-700">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
@@ -343,7 +405,8 @@ export default function UsersPage() {
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                ))
+                                )}
                             </tbody>
                         </table>
                     </div>

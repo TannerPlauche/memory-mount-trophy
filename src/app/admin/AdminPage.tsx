@@ -34,7 +34,7 @@ const AdminPage = () => {
                     <div className="flex items-center">
                         <UserGroupIcon className="h-8 w-8 mr-4 text-green-400" />
                         <div>
-                            <h2 className="text-xl font-semibold">Manage Users  </h2>
+                            <h2 className="text-primary-light text-xl font-semibold">Manage Users  </h2>
                             <p className="mt-2 text-primary-gold">View and manage user accounts</p>
                         </div>
                     </div>
@@ -43,7 +43,7 @@ const AdminPage = () => {
                     <div className="flex items-center">
                         <CodeBracketIcon className="h-8 w-8 mr-4 text-neutral" />
                         <div>
-                            <h2 className="text-xl font-semibold">Memory Codes</h2>
+                            <h2 className="text-primary-light text-xl font-semibold">Memory Codes</h2>
                             <p className="mt-2 text-primary-gold">Generate and manage memory codes</p>
                         </div>
                     </div>
@@ -52,7 +52,7 @@ const AdminPage = () => {
                     <div className="flex items-center">
                         <DocumentTextIcon className="h-8 w-8 mr-4 text-yellow-400" />
                         <div>
-                            <h2 className="text-xl font-semibold">Reports</h2>
+                            <h2 className="text-primary-light text-xl font-semibold">Reports</h2>
                             <p className="mt-2 text-primary-gold">View system reports and analytics</p>
                         </div>
                     </div>
