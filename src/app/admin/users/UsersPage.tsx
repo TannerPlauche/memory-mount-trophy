@@ -250,28 +250,28 @@ export default function UsersPage() {
 
     if (!isAdmin) {
         return (
-            <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-darker flex items-center justify-center">
                 <div className="text-center">
-                    <h2 className="text-xl font-bold text-white mb-4">Access Denied</h2>
-                    <p className="text-gray-400">You don&apos;t have permission to access this page.</p>
+                    <h2 className="text-xl font-bold text-primary-light mb-4">Access Denied</h2>
+                    <p className="text-primary-gold">You don&apos;t have permission to access this page.</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 py-10 px-4 md:px-10 text-gray-100">
+        <div className="min-h-screen bg-darker py-10 px-4 md:px-10 text-primary-light">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+                <div className="bg-primary-dark shadow-lg rounded-lg p-6 mb-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-white">User Management</h1>
-                            <p className="text-gray-400 mt-1">Manage users and their memory mounts</p>
+                            <h1 className="text-3xl font-bold text-primary-light">User Management</h1>
+                            <p className="text-primary-gold mt-1">Manage users and their memory mounts</p>
                         </div>
                         <button
                             onClick={() => router.push('/admin')}
-                            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+                            className="bg-primary-neutral hover:bg-primary-gold text-primary-dark px-4 py-2 rounded-lg transition-colors"
                         >
                             Back to Admin
                         </button>
@@ -292,10 +292,10 @@ export default function UsersPage() {
                 )}
 
                 {/* Users Table */}
-                <div className="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                    <div className="p-6 border-b border-gray-700">
+                <div className="bg-primary-dark shadow-lg rounded-lg overflow-hidden">
+                    <div className="p-6 border-b border-primary-gold">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <h2 className="text-xl font-semibold text-white">
+                            <h2 className="text-xl font-semibold text-primary-light">
                                 All Users ({filteredUsers.length}{searchTerm && ` of ${users.length}`})
                             </h2>
                             
@@ -306,10 +306,10 @@ export default function UsersPage() {
                                     placeholder="Search by name or email..."
                                     value={searchTerm}
                                     onChange={handleSearchChange}
-                                    className="w-full sm:w-80 bg-gray-700 text-white border border-gray-600 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full sm:w-80 bg-darker text-primary-light border border-primary-gold rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-primary-gold focus:border-primary-gold"
                                 />
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-5 w-5 text-primary-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                 </div>
@@ -319,20 +319,20 @@ export default function UsersPage() {
 
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gray-700">
+                            <thead className="bg-darker">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">User</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Role</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Created</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-gold uppercase tracking-wider">User</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-gold uppercase tracking-wider">Role</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-gold uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-gold uppercase tracking-wider">Created</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-primary-gold uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-gray-800 divide-y divide-gray-700">
+                            <tbody className="bg-primary-dark divide-y divide-primary-gold">
                                 {filteredUsers.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-8 text-center">
-                                            <div className="text-gray-400">
+                                            <div className="text-primary-gold">
                                                 {searchTerm ? (
                                                     <>
                                                         <p className="text-lg font-medium">No users found</p>
@@ -346,24 +346,24 @@ export default function UsersPage() {
                                     </tr>
                                 ) : (
                                     filteredUsers.map((user) => (
-                                    <tr key={user._id} className="hover:bg-gray-700">
+                                    <tr key={user._id} className="hover:bg-darker">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
-                                                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                                                    <User size={20} className="text-white" />
+                                                <div className="w-10 h-10 bg-primary-gold rounded-full flex items-center justify-center">
+                                                    <User size={20} className="text-primary-dark" />
                                                 </div>
                                                 <div className="ml-4">
-                                                    <div className="text-sm font-medium text-white">
+                                                    <div className="text-sm font-medium text-primary-light">
                                                         {user.name || 'No name'}
                                                     </div>
-                                                    <div className="text-sm text-gray-400">{user.email}</div>
+                                                    <div className="text-sm text-primary-gold">{user.email}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.role === 'admin'
                                                     ? 'bg-purple-900 text-purple-200'
-                                                    : 'bg-blue-900 text-blue-200'
+                                                    : 'bg-primary-neutral text-primary-dark'
                                                 }`}>
                                                 {user.role}
                                             </span>
@@ -376,14 +376,14 @@ export default function UsersPage() {
                                                 {user.isVerified ? 'Verified' : 'Unverified'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-primary-gold">
                                             {formatDate(user.createdAt)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex space-x-2">
                                                 <button
                                                     onClick={() => handleEditUser(user)}
-                                                    className="text-blue-400 hover:text-blue-300"
+                                                    className="text-primary-gold hover:text-primary-light"
                                                     title="Edit User"
                                                 >
                                                     <Edit size={16} />
@@ -429,43 +429,43 @@ export default function UsersPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* User Information */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-medium text-white border-b border-gray-600 pb-2">
+                                <h3 className="text-lg font-medium text-primary-light border-b border-primary-gold pb-2">
                                     User Information
                                 </h3>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    <label className="block text-sm font-medium text-primary-gold mb-1">
                                         Name
                                     </label>
                                     <input
                                         type="text"
                                         value={editForm.name}
                                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full bg-darker text-primary-light border border-primary-gold rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-gold"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    <label className="block text-sm font-medium text-primary-gold mb-1">
                                         Email
                                     </label>
                                     <input
                                         type="email"
                                         value={editForm.email}
                                         onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full bg-darker text-primary-light border border-primary-gold rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-gold"
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    <label className="block text-sm font-medium text-primary-gold mb-1">
                                         Role
                                     </label>
                                     <select
                                         value={editForm.role}
                                         onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'user' | 'admin' })}
-                                        className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full bg-darker text-primary-light border border-primary-gold rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-gold"
                                     >
                                         <option value="user">User</option>
                                         <option value="admin">Admin</option>
@@ -475,30 +475,30 @@ export default function UsersPage() {
 
                             {/* Memory Mounts */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-medium text-white border-b border-gray-600 pb-2">
+                                <h3 className="text-lg font-medium text-primary-light border-b border-primary-gold pb-2">
                                     Memory Mounts ({userMemoryMounts.length})
                                 </h3>
 
                                 <div className="max-h-80 overflow-y-auto space-y-2">
                                     {userMemoryMounts.length === 0 ? (
-                                        <p className="text-gray-400 text-sm">No memory mounts found</p>
+                                        <p className="text-primary-gold text-sm">No memory mounts found</p>
                                     ) : (
                                         userMemoryMounts.map((mount) => (
-                                            <div key={mount.id} className="cursor-pointer bg-gray-700 rounded-lg p-3 border border-gray-600">
+                                            <div key={mount.id} className="cursor-pointer bg-darker rounded-lg p-3 border border-primary-gold">
                                                 <a href={`/trophy/${mount.id}`} target="_blank" rel="noopener noreferrer">
                                                     <div className="flex items-start justify-between">
                                                         <div>
-                                                            <p className="text-sm font-medium text-white font-mono">
+                                                            <p className="text-sm font-medium text-primary-light font-mono">
                                                                 {mount.name || mount.id}
                                                             </p>
-                                                            <p className="text-xs text-gray-400">
+                                                            <p className="text-xs text-primary-gold">
                                                                 Code: {mount.code}
                                                             </p>
-                                                            <p className="text-xs text-gray-400">
+                                                            <p className="text-xs text-primary-gold">
                                                                 Used: {formatDate(mount.usedAt)}
                                                             </p>
                                                         </div>
-                                                        <Award size={16} className="text-blue-400" />
+                                                        <Award size={16} className="text-primary-gold" />
                                                     </div>
                                                 </a>
                                             </div>
@@ -508,17 +508,17 @@ export default function UsersPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-end space-x-3 pt-4 border-t border-gray-600">
+                        <div className="flex justify-end space-x-3 pt-4 border-t border-primary-gold">
                             <button
                                 type="button"
                                 onClick={() => setShowEditModal(false)}
-                                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors"
+                                className="bg-primary-neutral hover:bg-primary-gold text-primary-dark px-6 py-2 rounded-lg transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                                className="bg-primary-gold hover:bg-primary-neutral text-primary-dark px-6 py-2 rounded-lg transition-colors"
                             >
                                 Save Changes
                             </button>
@@ -537,7 +537,7 @@ export default function UsersPage() {
                     size="sm"
                 >
                     <div className="space-y-4">
-                        <p className="text-gray-300">
+                        <p className="text-primary-gold">
                             Are you sure you want to delete the user <strong>{selectedUser?.name || selectedUser?.email}</strong>?
                         </p>
                         <p className="text-red-400 text-sm">
@@ -547,7 +547,7 @@ export default function UsersPage() {
                         <div className="flex justify-end space-x-3 pt-4">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
-                                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+                                className="bg-primary-neutral hover:bg-primary-gold text-primary-dark px-4 py-2 rounded-lg transition-colors"
                             >
                                 Cancel
                             </button>
