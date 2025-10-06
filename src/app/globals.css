@@ -96,10 +96,17 @@ body {
   border-bottom: 1px solid;
 }
 
+.card-bg-darker {
+  background-color: #93b0ed;
+  border-top: solid 1px rgb(222, 154, 154);
+  border-right: solid 1px rgb(241, 136, 136);
+}
+
 .bg-darker {
   /* Very dark navy background */
-  background-color: #030360;
+  background-color: #ceced3;
 }
+
 
 .text-darker {
   /* Very dark navy text */

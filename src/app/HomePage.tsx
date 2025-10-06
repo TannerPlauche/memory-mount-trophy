@@ -8,14 +8,14 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen bg-darker flex flex-col items-center justify-start sm:pt-[2rem] font-sans">
-            <main className="w-full max-w-2xl bg-white/5 backdrop-blur-lg sm:rounded-xl shadow-2xl p-10 flex flex-col items-center gap-8">
+            <main className="w-full card-bg-darker max-w-2xl bg-white/5 backdrop-blur-lg sm:rounded-xl shadow-2xl p-10 flex flex-col items-center gap-8">
                 <div className="flex flex-col items-center gap-4">
                     <h1 className="text-5xl font-extrabold text-neutral text-center">
-                        Welcome to <span className="text-primary-gold">Memory Mount</span>
+                        Welcome to <span className="text-primary-gold">Victory Vault</span>
                     </h1>
-                    <p className="text-lg text-gray-200 text-center max-w-xl">
+                    <p className="text-lg text-gray-800 text-center max-w-xl">
                         Your one-stop solution for managing and showcasing your digital trophies.<br />
-                        Securely store, organize, and share your hunting and fishing memories.
+                        Securely store, organize, and share achievement and victory memories.
                     </p>
                 </div>
                 <div className="flex flex-col items-center gap-4 w-full">
