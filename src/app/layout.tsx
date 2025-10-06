@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import logo from '../../public/assets/memoryMountLogoSimple.png';
+import logo from '../../public/assets/middle-tennessee-trophy-logo.jpg';
 import Image from "next/image";
 
 const geistSans = Geist({
@@ -32,9 +32,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <div className="bg-taupe  flex items-center justify-center py-1">
+        <div className="bg-taupe flex flex-col items-center justify-center py-1">
           <a href="https://memorymount.com" target="_blank" rel="noopener noreferrer">
             <Image src={logo} alt="Logo" height={100} />
+          </a>
+          <h4 className="layout-header-gold text-2xl mt-3">Middle Tennessee Trophy</h4>
+          <h4 className="layout-header-gold text-xl">Mt. Juliet, TN.</h4>
+          <a href="tel:+16157546082" target="_blank" rel="noopener noreferrer">
+            <h4 className="layout-header-gold text-md">(615) 754-6082</h4>
           </a>
         </div>
         {children}

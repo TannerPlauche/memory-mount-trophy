@@ -43,66 +43,70 @@ body {
 
 
 .bg-primary-light {
-  background-color: #F4F4F4;
-  color: #4A4B4C;
+  background-color: #FFFFFF;
+  color: #1E3A8A;
 }
 
 .text-primary-light {
-  color: #F4F4F4;
+  color: #FFFFFF;
 }
 
 .bg-primary-dark {
-  /* background-color: #2B2C2D; */
-  background-color: #4A4B4C;
+  /* Deep navy blue background */
+  background-color: #8fd6df;
 }
 
 .text-primary-dark {
-  /* background-color: #2B2C2D; */
-  color: #4A4B4C;
+  /* Navy blue text */
+  color: #1E3A8A;
 }
 
 .border-primary-dark {
-  border-color: #4A4B4C;
+  border-color: #1E3A8A;
 }
 
 .bg-primary-neutral {
-  background-color: #C2B7AC;
-  color: #2B2C2D;
+  background-color: #3B82F6;
+  color: #FFFFFF;
 }
 
 .bg-primary-neutral:hover {
-  background-color: #D4A574;
+  background-color: #2563EB;
 }
 
 .text-neutral {
-  color: #C2B7AC;
+  color: #0551ae;
 }
 
 .bg-primary-gold {
-  background-color: #D4A574;
-  color: #4A4B4C;
+  background-color: #040287;
+  color: #FFFFFF;
 }
 
 .text-primary-gold {
-  color: #D4A574;
+  color: #00064d;
+}
+
+.layout-header-gold {
+  color: #e5e809;
 }
 
 .border-b-gold {
-  border-color: #D4A574 !important;
+  border-color: #EF4444 !important;
   border-bottom: 1px solid;
 }
 
 .bg-darker {
-  /* background-color: #4A4B4C; */
-  background-color: #2B2C2D;
+  /* Very dark navy background */
+  background-color: #030360;
 }
 
 .text-darker {
-  /* background-color: #4A4B4C; */
-  color: #2B2C2D;
+  /* Very dark navy text */
+  color: #0F172A;
 }
 
 .bg-taupe {
-  background-color: #B5A391;
-  color: #2B2C2D;
+  background-color: #2563EB;
+  color: #FFFFFF;
 }
