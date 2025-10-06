@@ -406,7 +406,7 @@ export default function AccountPage() {
                                         <div
                                             key={trophy.id}
                                             className="bg-primary-light border border-gray-600 rounded-lg p-4 hover:bg-gray-650 transition-colors cursor-pointer"
-                                            onClick={() => router.push(`/trophy/${trophy.id}`)}
+                                            onClick={() => router.push(`/mtt/${trophy.id}`)}
                                         >
                                             <div className="flex items-start justify-between mb-3">
                                                 <h3 className="font-medium text-primary-dark truncate">{trophy.name}</h3>
@@ -463,7 +463,7 @@ export default function AccountPage() {
                                         <div
                                             key={mount.id}
                                             className="bg-primary-light border border-gray-600 rounded-lg p-4 cursor-pointer hover:bg-gray-650 transition-colors"
-                                            onClick={() => router.push(`/trophy/${mount.id}`)}
+                                            onClick={() => router.push(`/mtt/${mount.id}`)}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div>

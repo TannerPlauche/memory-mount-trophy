@@ -485,7 +485,7 @@ export default function UsersPage() {
                                     ) : (
                                         userMemoryMounts.map((mount) => (
                                             <div key={mount.id} className="cursor-pointer bg-darker rounded-lg p-3 border border-primary-gold">
-                                                <a href={`/trophy/${mount.id}`} target="_blank" rel="noopener noreferrer">
+                                                <a href={`/mtt/${mount.id}`} target="_blank" rel="noopener noreferrer">
                                                     <div className="flex items-start justify-between">
                                                         <div>
                                                             <p className="text-sm font-medium text-primary-light font-mono">

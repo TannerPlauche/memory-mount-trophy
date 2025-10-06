@@ -69,9 +69,9 @@ export async function POST(req: Request, { params }: TrophyIdParams) {
         }
 
         // Redirect regardless of error or success
-        return redirect(`/trophy/${trophyId}`);
+        return redirect(`/mtt/${trophyId}`);
     } catch (err) {
         console.error("POST error:", err);
-        return redirect(`/trophy/${(await params).trophyId}`);
+        return redirect(`/mtt/${(await params).trophyId}`);
     }
 }

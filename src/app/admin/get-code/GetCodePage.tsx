@@ -72,7 +72,7 @@ const GetCodePage = () => {
         if (!unusedId) {
             alert("No Memory Id to copy");
         } else {
-            const fullUrl = `${window.location.origin}/trophy/${unusedId}`;
+            const fullUrl = `${window.location.origin}/mtt/${unusedId}`;
             navigator.clipboard.writeText(fullUrl);
             setMessage(`Memory Id copied to clipboard: \n ${fullUrl}`);
             displayMessageTemp();
@@ -119,7 +119,7 @@ const GetCodePage = () => {
                     </button>
                     {displayMessage && <div className="message text-primary-dark">{message}</div>}
                     <br />
-                    <a href={`/trophy/${unusedId}`} className="text-blue-500 hover:underline">Open this Memory ID</a>
+                    <a href={`/mtt/${unusedId}`} className="text-blue-500 hover:underline">Open this Memory ID</a>
                 </div>
             ) : (
                 <p className="text-black text-center">Loading...</p>

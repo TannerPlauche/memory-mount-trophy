@@ -36,7 +36,7 @@ export default function CodeCheck({ }) {
                 if (response.status === 200) {
                     setVerifiedCode(trophyId);
                     const redirectPath = urlDecode(redirect)
-                    router.push(redirectPath || `/trophy/${trophyId}`);
+                    router.push(redirectPath || `/mtt/${trophyId}`);
                 } else {
                     setError(response.data.message);
                 }
@@ -46,7 +46,7 @@ export default function CodeCheck({ }) {
                 if (code.toLowerCase() === "abc123") {
                     setVerifiedCode(trophyId);
                     const redirectPath = urlDecode(redirect)
-                    router.push(redirectPath || `/trophy/${trophyId}`);
+                    router.push(redirectPath || `/mtt/${trophyId}`);
                 } else {
                     setError("Invalid code.");
                 }

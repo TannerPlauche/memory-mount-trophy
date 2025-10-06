@@ -31,7 +31,7 @@ export default function LoginPage({ }) {
             .then(response => {
                 setLocalStorageItem('userToken', response?.data?.user?.token || 'sdsdsdsfdfsdf');
                 const redirectUrl = urlDecode(redirect);
-                router.push(redirectUrl || `/trophy/${trophyId}`);
+                router.push(redirectUrl || `/mtt/${trophyId}`);
             })
             .catch(error => {
                 console.log('error: ', error);
