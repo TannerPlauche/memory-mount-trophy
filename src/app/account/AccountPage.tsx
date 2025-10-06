@@ -6,6 +6,7 @@ import Modal from '@/app/components/Modal/Modal';
 import { urlEncode } from '@/app/shared/helpers';
 import { useAuthToken } from '@/app/hooks/useAuthToken';
 import { User, Edit, Award, Code, LogOut, Settings, Camera, Calendar, Star } from '@geist-ui/icons';
+import Link from 'next/link';
 
 interface UserData {
     id: string;
@@ -357,7 +358,7 @@ export default function AccountPage() {
                                             </span>
                                             {userData?.admin && (
                                                 <div className='mt-2'>
-                                                    <a className='text-blue-400 hover:underline' href="/admin">Go to Admin Panel</a>
+                                                    <Link href="/admin" className='text-blue-400 hover:underline'>Go to Admin Panel</Link>
                                                 </div>
                                             )}
                                         </div>
