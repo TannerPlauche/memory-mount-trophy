@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
     domains: [
       'efkxco7aewrvgfgj.public.blob.vercel-storage.com',
       'memory-mount.s3.us-east-2.amazonaws.com',
+      'memory-mount.s3.us-central-1.wasabisys.com',
       '*'
       // add any other domains you need
     ],

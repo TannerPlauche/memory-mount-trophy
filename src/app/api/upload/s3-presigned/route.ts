@@ -2,18 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { S3Client } from '@aws-sdk/client-s3';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 
-const AWS_REGION = process.env.AWS_REGION || 'us-east-2';
-const S3_BUCKET = process.env.AWS_S3_BUCKET || 'memory-mount';
-const S3_FOLDER = process.env.AWS_S3_FOLDER || 'uploads/';
+const WS_REGION = process.env.WS_REGION || 'us-central-1';
+const S3_BUCKET = process.env.WS_S3_BUCKET || 'memory-mount';
+const S3_FOLDER = process.env.WS_S3_FOLDER || 'uploads/';
+const WS_ENDPOINT = process.env.WS_SW_ENDPOINT_URL || 's3.us-central-1.wasabisys.com';
 
 const s3Client = new S3Client({
-    region: AWS_REGION,
+    region: WS_REGION,
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+        accessKeyId: process.env.WS_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.WS_SECRET_ACCESS_KEY || '',
     },
-    forcePathStyle: false,
-    endpoint: `https://s3.${AWS_REGION}.amazonaws.com`,
+    forcePathStyle: false, // Wasabi supports virtual-hosted-style URLs
+    endpoint: `https://${WS_ENDPOINT}`,
 });
 
 export async function POST(request: NextRequest) {
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
             Expires: 600, // 10 minutes
         });
 
-        const fileUrl = `https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
+        const fileUrl = `https://${S3_BUCKET}.${WS_ENDPOINT}/${key}`;
 
         return NextResponse.json({
             success: true,

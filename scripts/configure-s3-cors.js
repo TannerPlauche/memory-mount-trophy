@@ -18,15 +18,17 @@ if (fs.existsSync(envPath)) {
     });
 }
 
-const AWS_REGION = process.env.AWS_REGION || 'us-east-2';
-const S3_BUCKET = process.env.AWS_S3_BUCKET || 'memory-mount';
+const WS_REGION = process.env.WS_REGION || 'us-central-1';
+const S3_BUCKET = process.env.WS_S3_BUCKET || 'memory-mount';
+const WS_ENDPOINT = process.env.WS_SW_ENDPOINT_URL || 's3.us-central-1.wasabisys.com';
 
 const s3Client = new S3Client({
-    region: AWS_REGION,
+    region: WS_REGION,
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        accessKeyId: process.env.WS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.WS_SECRET_ACCESS_KEY,
     },
+    endpoint: `https://${WS_ENDPOINT}`,
 });
 
 const corsConfiguration = {
@@ -62,7 +64,7 @@ const corsConfiguration = {
 
 async function configureCORS() {
     try {
-        console.log(`Configuring CORS for bucket: ${S3_BUCKET} in region: ${AWS_REGION}`);
+        console.log(`Configuring CORS for bucket: ${S3_BUCKET} in region: ${WS_REGION}`);
         
         // First, check current CORS configuration
         try {
@@ -98,7 +100,7 @@ async function configureCORS() {
             console.log('\n💡 Solutions:');
             console.log('1. Ensure your AWS credentials have s3:PutBucketCors permission');
             console.log('2. Check that the bucket name is correct:', S3_BUCKET);
-            console.log('3. Verify the region is correct:', AWS_REGION);
+            console.log('3. Verify the region is correct:', WS_REGION);
         }
     }
 }

@@ -194,11 +194,12 @@ export default function TrophyPage() {
                     const processedImageFiles = imageFiles.map((file) => ({
                         ...file,
                         url: file.url,
+                        downloadUrl: file.downloadUrl,
                         name: file.url,
                     }));
                     setImageFiles(processedImageFiles);
                     setSlides(imageFiles.map((imageFile) => ({
-                        src: imageFile.url,
+                        src: imageFile.downloadUrl,
                         width: 800,
                         height: 600
                     })));
